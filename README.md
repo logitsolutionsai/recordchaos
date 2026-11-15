@@ -1,3 +1,11 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/media/hero-dark.webp">
+    <source media="(prefers-color-scheme: light)" srcset="docs/media/hero-light.webp">
+    <img src="docs/media/hero-light.webp" width="100%" alt="Eight of the ways recordchaos breaks a synthetic patient record, beside its report on the example importer: 67 of 80 cases broke it, and the first finding says the importer kept the older reading when a correction arrived 3 days later.">
+  </picture>
+</p>
+
 > The results below were measured on one development machine on 2026-11-15; they are not a release benchmark.
 
 # recordchaos
