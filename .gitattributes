@@ -1,0 +1,9 @@
+# Check out every text file with LF line endings on every platform. The tools
+# hash their input files and snapshot-test their output, so a CRLF checkout
+# (the Windows default) would change the bytes and the hashes.
+* text=auto eol=lf
+
+# Binary files: never convert.
+*.png binary
+*.woff2 binary
+*.wasm binary
