@@ -1,4 +1,4 @@
-> **Status: pre-release.** Version 0.1.0 is not published yet; until it is, install from source. The results below were measured on one development machine on 2026-11-15; they are not a release benchmark.
+> The results below were measured on one development machine on 2026-11-15; they are not a release benchmark.
 
 # recordchaos
 
@@ -55,24 +55,21 @@ Developers who write code that reads FHIR: importers, EHR integrations, patient 
 
 ## Install
 
-Nothing is published yet. Once released:
-
 ```bash
-# Prebuilt binary (shell installer; a PowerShell installer is also provided)
+# Command-line tool: Homebrew (macOS, Linux)
+brew install logitsolutionsai/tap/recordchaos
+
+# Command-line tool: prebuilt binary (macOS, Linux)
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/logitsolutionsai/recordchaos/releases/latest/download/recordchaos-installer.sh | sh
 
-# From source
-cargo install --git https://github.com/logitsolutionsai/recordchaos recordchaos
+# Command-line tool: from crates.io
+cargo install recordchaos
 
-# Python package and pytest plugin
+# Python package and pytest plugin (wheels for Linux, macOS and Windows)
 pip install recordchaos
 ```
 
-Before release, build the Python package from a clone of the repository (needs Rust):
-
-```bash
-pip install ./python
-```
+On Windows, use the PowerShell installer on the [releases page](https://github.com/logitsolutionsai/recordchaos/releases/latest). Each release archive includes `THIRD-PARTY-LICENSES.html`.
 
 ## Quick Start
 
