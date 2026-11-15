@@ -24,18 +24,12 @@ jobs:
     strategy:
       matrix:
         platform:
+          # x86_64 and aarch64 only: the HTTP client's TLS stack (ring) does not
+          # build with the older manylinux2014 cross compilers.
           - runner: ubuntu-22.04
             target: x86_64
           - runner: ubuntu-22.04
-            target: x86
-          - runner: ubuntu-22.04
             target: aarch64
-          - runner: ubuntu-22.04
-            target: armv7
-          - runner: ubuntu-22.04
-            target: s390x
-          - runner: ubuntu-22.04
-            target: ppc64le
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -47,7 +41,9 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --manifest-path python/Cargo.toml
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-          manylinux: auto
+          # glibc 2.28 or later (any current distribution); its cross
+          # compilers are new enough for ring's aarch64 assembly.
+          manylinux: 2_28
       - name: Upload wheels
         uses: actions/upload-artifact@v6
         with:

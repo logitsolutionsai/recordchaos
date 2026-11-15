@@ -131,6 +131,9 @@ jobs:
         uses: "taiki-e/install-action@v2"
         with:
           "tool": "cargo-about@0.9.3"
+      - name: "Make sure the cargo-about command exists"
+        run: "cargo about --version || cargo install --locked cargo-about --version 0.9.3 --features cli"
+        shell: "bash"
       - name: "Write THIRD-PARTY-LICENSES.html"
         run: "cargo about generate about.hbs -o THIRD-PARTY-LICENSES.html"
       - name: Install dist

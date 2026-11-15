@@ -6,5 +6,10 @@
   uses: taiki-e/install-action@v2
   with:
     tool: cargo-about@0.9.3
+# taiki-e has no prebuilt cargo-about for every target (x86_64-apple-darwin);
+# its fallback compiles it without the `cli` feature, so there is no command.
+- name: Make sure the cargo-about command exists
+  shell: bash
+  run: cargo about --version || cargo install --locked cargo-about --version 0.9.3 --features cli
 - name: Write THIRD-PARTY-LICENSES.html
   run: cargo about generate about.hbs -o THIRD-PARTY-LICENSES.html
