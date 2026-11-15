@@ -1,0 +1,75 @@
+# Every operator in the registry, on the three-patient bundle (operator 18
+# needs at least two patients). Used by the property tests and for the
+# README's schema-valid share and expected-invalid agreement.
+fhir_version = "4.0.1"
+base = "../fixtures/bundles/family-c.json"
+seed = 22
+cases = 200
+max_mutations_per_case = 2
+as_of = "2026-03-31"
+
+[[operator]]
+id = "observation.duplicate_with_changed_issued"
+
+[[operator]]
+id = "observation.correction_sequence"
+
+[[operator]]
+id = "identifier.duplicate_business_identifier"
+
+[[operator]]
+id = "medication.conflicting_active_requests"
+
+[[operator]]
+id = "time.backdate_effective"
+
+[[operator]]
+id = "time.future_effective"
+
+[[operator]]
+id = "time.date_only_precision"
+
+[[operator]]
+id = "time.timezone_offset_shift"
+
+[[operator]]
+id = "time.period_end_before_start"
+
+[[operator]]
+id = "quantity.equivalent_unit"
+
+[[operator]]
+id = "quantity.remove_unit_code"
+
+[[operator]]
+id = "observation.data_absent_reason"
+
+[[operator]]
+id = "observation.remove_code"
+
+[[operator]]
+id = "observation.remove_status"
+
+[[operator]]
+id = "reference.to_urn_uuid"
+
+[[operator]]
+id = "reference.to_absolute_url"
+
+[[operator]]
+id = "reference.dangling_target"
+
+[[operator]]
+id = "reference.cross_patient"
+
+[[operator]]
+id = "bundle.reorder_entries"
+
+[[operator]]
+id = "bundle.duplicate_full_url"
+
+[[operator]]
+id = "resource.unexpected_type"
+
+[[operator]]
+id = "text.unicode_narrative"

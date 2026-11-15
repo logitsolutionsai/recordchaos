@@ -1,0 +1,15 @@
+# The buggy example importer as a command target. Build it first:
+#   cargo build --example buggy_importer
+# Paths are relative to the folder you run recordchaos from (the repo root).
+kind = "command"
+reset   = ["./target/debug/examples/buggy_importer", "reset"]
+ingest  = ["./target/debug/examples/buggy_importer", "ingest"]   # bundle on stdin
+observe = ["./target/debug/examples/buggy_importer", "observe"]  # view JSON on stdout
+timeout_ms = 5000
+
+[accept]
+rejected_exit_codes = [2]          # exit 2 with a message = rejected cleanly
+
+[view]                             # JSON Pointers into the observed view
+latest_glucose = "/latest/synthetic-glucose"
+patient_count  = "/patients/count"

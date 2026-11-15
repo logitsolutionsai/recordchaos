@@ -1,0 +1,59 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/recordchaos-core",
+    "crates/recordchaos-report",
+    "crates/recordchaos-cli",
+    "python",
+]
+# The Python bindings crate is built by maturin, not by a plain `cargo test`,
+# because linking it needs a Python interpreter.
+default-members = [
+    "crates/recordchaos-core",
+    "crates/recordchaos-report",
+    "crates/recordchaos-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+repository = "https://github.com/logitsolutionsai/recordchaos"
+authors = ["Logit Solutions AI"]
+keywords = ["fhir", "testing", "fuzzing", "healthcare", "chaos"]
+categories = ["development-tools::testing", "command-line-utilities"]
+
+[workspace.dependencies]
+serde = { version = "1.0.200", features = ["derive"] }
+# preserve_order keeps key order; arbitrary_precision keeps 1.50 as written.
+# Do not use #[serde(tag = ...)], #[serde(untagged)] or #[serde(flatten)] on any
+# type that holds numbers: with arbitrary_precision those break number parsing.
+serde_json = { version = "1.0.130", features = ["preserve_order", "arbitrary_precision"] }
+toml = "0.9"
+jsonschema = { version = "0.61.2", default-features = false }
+# 0.10 renames RngCore to Rng; 0.9 is pinned so the case stream stays the same.
+rand_chacha = "0.9"
+ureq = { version = "3.5", default-features = false, features = ["rustls"] }
+# 3.x makes serde optional and changes render(); stay on 2.x.
+minijinja = "2.24"
+quick-junit = "0.8"
+clap = { version = "4.5", features = ["derive"] }
+sha2 = "0.10"
+base64 = "0.22"
+proptest = "1.12"
+pyo3 = "0.30"
+recordchaos-core = { path = "crates/recordchaos-core", version = "0.1.0" }
+recordchaos-report = { path = "crates/recordchaos-report", version = "0.1.0" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+# The profile that dist will build release binaries with.
+[profile.dist]
+inherits = "release"
+lto = "thin"

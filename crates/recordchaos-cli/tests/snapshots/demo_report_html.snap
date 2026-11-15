@@ -1,0 +1,1238 @@
+---
+source: crates/recordchaos-cli/tests/demo.rs
+expression: html
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>recordchaos report · 67 of 80 cases broke the importer</title>
+<style>
+
+@font-face{font-family:"Geist";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,[FONT]) format("woff2")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,[FONT]) format("woff2")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:600;font-display:swap;src:url(data:font/woff2;base64,[FONT]) format("woff2")}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,[FONT]) format("woff2")}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,[FONT]) format("woff2")}
+
+:root{--ink:#0b1220;--muted:#4a5565;--rule:#e3e6eb;--surface:#f6f7f9;--ground:#ffffff;--blue:#0065FD;--blue-hover:#0654c8;--fail:#b42318;--fail-bg:#fdf1ef;--caution:#b54708;--caution-bg:#fdf5ec;--added:#eef4ff;--added-ink:#0654c8;--removed:#fdf1ef;--removed-ink:#b42318;--sq-pass:#c9ced6;--sq-rejected:#8b97a8;--code-bg:#0b1220;--code-ink:#e3e6eb;--code-muted:#8b97a8;--code-rule:#3a4658;color-scheme:light}
+/* Theme: the OS setting by default; data-theme="light" or "dark" on <html> forces one (for screenshots). */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e3e6eb;--muted:#a3adbb;--rule:#263044;--surface:#121a2b;--ground:#0b1220;--blue:#5b9bff;--blue-hover:#8bb8ff;--fail:#f97066;--fail-bg:#2a1414;--caution:#fdb022;--caution-bg:#2a2010;--added:#0f2147;--added-ink:#8bb8ff;--removed:#2a1414;--removed-ink:#f97066;--sq-pass:#3a4658;--sq-rejected:#6b778a;--code-bg:#050a14;--code-rule:#263044;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#e3e6eb;--muted:#a3adbb;--rule:#263044;--surface:#121a2b;--ground:#0b1220;--blue:#5b9bff;--blue-hover:#8bb8ff;--fail:#f97066;--fail-bg:#2a1414;--caution:#fdb022;--caution-bg:#2a2010;--added:#0f2147;--added-ink:#8bb8ff;--removed:#2a1414;--removed-ink:#f97066;--sq-pass:#3a4658;--sq-rejected:#6b778a;--code-bg:#050a14;--code-rule:#263044;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:Geist,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:22px;font-variant-numeric:tabular-nums}
+a{color:var(--blue)}a:hover{color:var(--blue-hover)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+code,.mono{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:32px}
+header.top{border-bottom:1px solid var(--rule)}
+header.top .wrap{padding-block:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
+.brand{display:flex;align-items:baseline;gap:10px}.brand .name{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:15px;font-weight:500}.brand .ver{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted)}
+.synthetic{font-size:13px;line-height:18px;font-weight:600}
+main.wrap{padding-block:48px 64px;display:flex;flex-direction:column;gap:56px}
+section{display:flex;flex-direction:column}
+.summary{gap:20px}
+.runline{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+h1{margin:0;font-size:34px;line-height:40px;font-weight:600;letter-spacing:-0.01em;text-wrap:pretty}
+.lede{margin:0;max-width:720px;font-size:17px;line-height:26px;color:var(--muted);text-wrap:pretty}
+.squares{display:flex;flex-wrap:wrap;gap:4px;padding-top:8px}
+.sq{display:block;width:22px;height:22px;border-radius:2px;background:var(--sq-pass)}
+.sq.rejected{background:var(--sq-rejected)}
+.sq.rule{border:3px solid var(--fail);background:var(--fail-bg)}
+.sq.crashed{background:var(--fail)}
+.sq.notchecked{background:transparent;border:1.5px solid var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;line-height:18px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend .key{width:12px;height:12px;border-radius:2px}
+.legend strong{font-weight:600;color:var(--ink)}.legend strong.bad{color:var(--fail)}
+dl.meta{margin:8px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:0 32px;border-top:1px solid var(--rule)}
+dl.meta div{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-bottom:1px solid var(--rule)}
+dl.meta dt{font-size:13px;line-height:18px;color:var(--muted)}
+dl.meta dd{margin:0;font-size:14px;line-height:20px;overflow-wrap:anywhere}
+dl.meta dd.mono{font-size:13px}
+.caution{color:var(--caution);font-weight:500}
+h2{margin:0 0 8px;font-size:18px;line-height:24px;font-weight:600}
+article.finding{display:flex;flex-direction:column;gap:16px;padding:24px 0 32px;border-top:2px solid var(--ink)}
+article.finding:last-child{border-bottom:1px solid var(--rule)}
+.fhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.fid,.foracle{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+.fcount{margin-left:auto;font-size:13px;line-height:18px;color:var(--muted)}
+.label{display:inline-flex;align-items:center;gap:8px;padding:2px 8px;border-radius:4px;font-size:13px;line-height:20px;font-weight:600}
+.label.fail{background:var(--fail-bg);color:var(--fail)}
+.label.caution{background:var(--caution-bg);color:var(--caution)}
+.label .shape{width:8px;height:8px;border-radius:1px}
+.label.crashed .shape{background:var(--fail)}
+.label.rule .shape{border:2px solid var(--fail)}
+.label.flaky .shape{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid var(--caution);border-radius:0}
+h3{margin:0;font-size:20px;line-height:28px;font-weight:600;text-wrap:pretty}
+.fbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:24px 40px;align-items:start}
+.fleft{display:flex;flex-direction:column;gap:16px;min-width:0}
+.facts{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px 16px;font-size:14px;line-height:20px}
+.facts .k{color:var(--muted)}.facts .v{overflow-wrap:anywhere}
+table.layers{width:100%;border-collapse:collapse;font-size:13px;line-height:18px}
+table.layers caption{text-align:left;padding-bottom:8px;font-weight:600}
+table.layers tr{border-top:1px solid var(--rule)}table.layers tr:last-child{border-bottom:1px solid var(--rule)}
+table.layers td{padding:8px 0}table.layers td.r{text-align:right}
+.why{margin:0;font-size:13px;line-height:18px;color:var(--muted)}
+.fright{display:flex;flex-direction:column;gap:12px;min-width:0}
+.diff{border:1px solid var(--rule);border-radius:4px;overflow:hidden;font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;line-height:20px}
+.diff .dhead{display:flex;justify-content:space-between;gap:16px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--rule);color:var(--muted);font-size:12px}
+.diff .dhead .dlabel{min-width:0;overflow-wrap:anywhere}.diff .dhead .dcount{flex:0 0 auto;white-space:nowrap}
+.diff .dbody{overflow-x:auto}
+.dl{display:grid;grid-template-columns:48px 20px minmax(0,1fr);min-width:420px;color:var(--muted)}
+.dl span:first-child{padding-left:12px}.dl .t{white-space:pre;color:var(--ink)}
+.dl.added{background:var(--added);color:var(--added-ink)}.dl.added .t{color:var(--added-ink)}
+.dl.removed{background:var(--removed);color:var(--removed-ink)}.dl.removed .t{color:var(--removed-ink)}
+.dl.gap .t{color:var(--muted)}
+.replay{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:10px 12px 10px 16px;border-radius:4px;background:var(--code-bg);color:var(--code-ink);font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;line-height:20px}
+/* Long commands wrap inside the box; Copy still copies the exact command. */
+.replay .cmd{min-width:0;padding-block:6px;white-space:pre-wrap;overflow-wrap:anywhere}.replay .prompt{color:var(--code-muted)}
+.replay button{flex:0 0 auto;min-height:32px;padding:0 12px;border:1px solid var(--code-rule);border-radius:4px;background:transparent;color:var(--code-ink);font:500 12px/1 Geist,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.nofail{margin:0;font-size:15px;color:var(--muted)}
+.tablehead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:16px}
+.tablehead h2{margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{min-height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:4px;background:var(--ground);color:var(--ink);font:500 13px/1 Geist,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--ground)}
+.tablewrap{overflow-x:auto;border-top:1px solid var(--rule)}
+table.cases{width:100%;min-width:880px;border-collapse:collapse;font-size:13px;line-height:18px}
+table.cases thead tr{text-align:left;color:var(--muted);background:var(--surface)}
+table.cases th{padding:10px 12px;font-weight:500}
+table.cases td{padding:10px 12px;vertical-align:top}
+table.cases tbody tr{border-top:1px solid var(--rule)}table.cases tbody tr:last-child{border-bottom:1px solid var(--rule)}
+table.cases td.mono{font-family:"Geist Mono",ui-monospace,Consolas,monospace}
+table.cases td.id,table.cases td.nowrap{white-space:nowrap}
+td.bad{color:var(--fail);font-weight:600}td.warn{color:var(--caution)}
+.tablenote{margin-top:16px;font-size:13px;line-height:18px;color:var(--muted)}
+.notchecked{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:24px 40px;border-top:1px solid var(--rule);padding-top:16px;margin-top:8px}
+.notchecked div{display:flex;flex-direction:column;gap:6px}
+.notchecked h3{font-size:15px;line-height:22px}
+.notchecked p{margin:0;font-size:14px;line-height:20px;color:var(--muted);text-wrap:pretty}
+footer.bottom{border-top:1px solid var(--rule)}
+footer.bottom .wrap{padding-block:20px 32px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:13px;line-height:18px;color:var(--muted)}
+footer.bottom strong{font-weight:600;color:var(--ink)}
+footer.bottom .wrap>span{min-width:0;overflow-wrap:anywhere}
+@media (max-width:480px){.wrap{padding-inline:16px}h1{font-size:28px;line-height:34px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<div class="brand"><span class="name">recordchaos</span><span class="ver">0.1.0</span></div>
+<span class="synthetic">Synthetic test data only</span>
+</div></header>
+
+<main class="wrap">
+<section class="summary" aria-labelledby="verdict">
+<div class="runline">scenarios&#x2f;demo.toml</div>
+<h1 id="verdict">67 of 80 cases broke the importer</h1>
+<p class="lede">They come from 4 causes. Each cause below is shrunk to the smallest bundle that still fails, with the one command that replays it.</p>
+<div class="squares" aria-label="One square per case">
+<a class="sq rule" href="#f1" aria-label="c-0001 rule broken" title="c-0001 rule broken"></a><a class="sq rule" href="#f2" aria-label="c-0002 rule broken" title="c-0002 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0003 rule broken" title="c-0003 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0004 crashed" title="c-0004 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0005 crashed" title="c-0005 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0006 rule broken" title="c-0006 rule broken"></a><a class="sq " href="#c-0007" aria-label="c-0007 passed" title="c-0007 passed"></a><a class="sq crashed" href="#f3" aria-label="c-0008 crashed" title="c-0008 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0009 rule broken" title="c-0009 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0010 crashed" title="c-0010 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0011 rule broken" title="c-0011 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0012 rule broken" title="c-0012 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0013 rule broken" title="c-0013 rule broken"></a><a class="sq rule" href="#f4" aria-label="c-0014 rule broken" title="c-0014 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0015 rule broken" title="c-0015 rule broken"></a><a class="sq " href="#c-0016" aria-label="c-0016 passed" title="c-0016 passed"></a><a class="sq rule" href="#f4" aria-label="c-0017 rule broken" title="c-0017 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0018 crashed" title="c-0018 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0019 rule broken" title="c-0019 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0020 crashed" title="c-0020 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0021 rule broken" title="c-0021 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0022 crashed" title="c-0022 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0023 rule broken" title="c-0023 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0024 crashed" title="c-0024 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0025 crashed" title="c-0025 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0026 crashed" title="c-0026 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0027 crashed" title="c-0027 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0028 rule broken" title="c-0028 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0029 crashed" title="c-0029 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0030 crashed" title="c-0030 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0031 crashed" title="c-0031 crashed"></a><a class="sq " href="#c-0032" aria-label="c-0032 passed" title="c-0032 passed"></a><a class="sq rule" href="#f2" aria-label="c-0033 rule broken" title="c-0033 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0034 crashed" title="c-0034 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0035 rule broken" title="c-0035 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0036 rule broken" title="c-0036 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0037 rule broken" title="c-0037 rule broken"></a><a class="sq " href="#c-0038" aria-label="c-0038 passed" title="c-0038 passed"></a><a class="sq crashed" href="#f3" aria-label="c-0039 crashed" title="c-0039 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0040 crashed" title="c-0040 crashed"></a><a class="sq " href="#c-0041" aria-label="c-0041 passed" title="c-0041 passed"></a><a class="sq rule" href="#f1" aria-label="c-0042 rule broken" title="c-0042 rule broken"></a><a class="sq rule" href="#f2" aria-label="c-0043 rule broken" title="c-0043 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0044 crashed" title="c-0044 crashed"></a><a class="sq crashed" href="#f3" aria-label="c-0045 crashed" title="c-0045 crashed"></a><a class="sq rule" href="#f4" aria-label="c-0046 rule broken" title="c-0046 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0047 crashed" title="c-0047 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0048 rule broken" title="c-0048 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0049 rule broken" title="c-0049 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0050 rule broken" title="c-0050 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0051 crashed" title="c-0051 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0052 rule broken" title="c-0052 rule broken"></a><a class="sq rejected" href="#c-0053" aria-label="c-0053 rejected cleanly" title="c-0053 rejected cleanly"></a><a class="sq rule" href="#f2" aria-label="c-0054 rule broken" title="c-0054 rule broken"></a><a class="sq " href="#c-0055" aria-label="c-0055 passed" title="c-0055 passed"></a><a class="sq rule" href="#f1" aria-label="c-0056 rule broken" title="c-0056 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0057 rule broken" title="c-0057 rule broken"></a><a class="sq rejected" href="#c-0058" aria-label="c-0058 rejected cleanly" title="c-0058 rejected cleanly"></a><a class="sq crashed" href="#f3" aria-label="c-0059 crashed" title="c-0059 crashed"></a><a class="sq rule" href="#f1" aria-label="c-0060 rule broken" title="c-0060 rule broken"></a><a class="sq rule" href="#f4" aria-label="c-0061 rule broken" title="c-0061 rule broken"></a><a class="sq rejected" href="#c-0062" aria-label="c-0062 rejected cleanly" title="c-0062 rejected cleanly"></a><a class="sq rule" href="#f1" aria-label="c-0063 rule broken" title="c-0063 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0064 crashed" title="c-0064 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0065 rule broken" title="c-0065 rule broken"></a><a class="sq " href="#c-0066" aria-label="c-0066 passed" title="c-0066 passed"></a><a class="sq rule" href="#f2" aria-label="c-0067 rule broken" title="c-0067 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0068 rule broken" title="c-0068 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0069 rule broken" title="c-0069 rule broken"></a><a class="sq crashed" href="#f3" aria-label="c-0070 crashed" title="c-0070 crashed"></a><a class="sq rule" href="#f2" aria-label="c-0071 rule broken" title="c-0071 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0072 rule broken" title="c-0072 rule broken"></a><a class="sq rejected" href="#c-0073" aria-label="c-0073 rejected cleanly" title="c-0073 rejected cleanly"></a><a class="sq rule" href="#f4" aria-label="c-0074 rule broken" title="c-0074 rule broken"></a><a class="sq " href="#c-0075" aria-label="c-0075 passed" title="c-0075 passed"></a><a class="sq rule" href="#f2" aria-label="c-0076 rule broken" title="c-0076 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0077 rule broken" title="c-0077 rule broken"></a><a class="sq rule" href="#f1" aria-label="c-0078 rule broken" title="c-0078 rule broken"></a><a class="sq rule" href="#f2" aria-label="c-0079 rule broken" title="c-0079 rule broken"></a><a class="sq rejected" href="#c-0080" aria-label="c-0080 rejected cleanly" title="c-0080 rejected cleanly"></a>
+</div>
+<div class="legend">
+<span><span class="key sq"></span><strong>8</strong> handled correctly</span>
+<span><span class="key sq rejected"></span><strong>5</strong> rejected cleanly, as expected</span>
+<span><span class="key sq rule" style="border-width:2px"></span><strong class="bad">43</strong> rule broken</span>
+<span><span class="key sq crashed"></span><strong class="bad">24</strong> crashed</span>
+
+</div>
+<dl class="meta">
+<div><dt>Target</dt><dd class="mono">[IMPORTER] --state state.json ingest</dd></div>
+<div><dt>Base bundle</dt><dd class="mono">fixtures&#x2f;bundles&#x2f;patient-a.json · 458e…7ff3</dd></div>
+<div><dt>Seed</dt><dd class="mono">20261114</dd></div>
+<div><dt>Operators</dt><dd class="">9 of 22 in the registry</dd></div>
+<div><dt>Checked with</dt><dd class="">R4 JSON schema, reference checker. <span class="caution">HL7 validator not run.</span></dd></div>
+
+</dl>
+</section>
+
+<section aria-labelledby="findings">
+<h2 id="findings">Failures, Grouped by Cause</h2>
+
+
+<article class="finding" id="f1">
+<div class="fhead">
+<span class="fid">F1</span>
+<span class="label fail rule"><span class="shape"></span>Rule broken</span>
+<span class="foracle">latest_correction_selected</span>
+<span class="fcount">25 cases · c-0001, c-0003, c-0006, c-0009, c-0012 and 20 more · already minimal</span>
+</div>
+<h3>The importer kept the older reading when a correction arrived 3 days later.</h3>
+<div class="fbody">
+<div class="fleft">
+<div class="facts">
+<span class="k">Expected</span><span class="v">6.1 mmol&#x2f;L from Observation&#x2f;obs-glucose-3-corrected, issued 2026-01-13T09:12:00Z</span>
+<span class="k">Got</span><span class="v">latest_glucose = 7.2 from Observation&#x2f;obs-glucose-3</span>
+<span class="k">Mutation</span><span class="v"><code>observation.duplicate_with_changed_issued days_later=3 value_delta=-1.1</code></span>
+<span class="k">Change</span><span class="v">Observation&#x2f;obs-glucose-3 copied as Observation&#x2f;obs-glucose-3-corrected: status corrected, issued 3 days later, value 7.2 to 6.1</span>
+<span class="k">Shrunk</span><span class="v">9 entries not needed to fail were removed</span>
+<span class="k">Check</span><span class="v">Built in. Reads &#x2f;latest&#x2f;synthetic-glucose from your target&#x27;s view</span>
+
+</div>
+<table class="layers">
+<caption>Validation of the shrunk bundle</caption>
+<tbody>
+<tr><td>R4 JSON schema 4.0.1</td><td class="r">Valid</td></tr>
+<tr><td>References inside the bundle</td><td class="r">All resolve</td></tr>
+<tr><td>HL7 validator</td><td class="r caution">Not run, add --strict</td></tr>
+
+</tbody>
+</table>
+<p class="why">This bundle is valid FHIR. A correction is legitimate, so a robust importer should prefer the later issued time or the final status.</p>
+</div>
+<div class="fright">
+
+<div class="diff">
+<div class="dhead"><span class="dlabel">Observation&#x2f;obs-glucose-3</span><span class="dcount">1 path changed</span></div>
+<div class="dbody" role="group" aria-label="Diff of the shrunk bundle against the base bundle">
+<div class="dl context"><span>105</span><span></span><span class="t">        }</span></div>
+<div class="dl context"><span>106</span><span></span><span class="t">      }</span></div>
+<div class="dl added"><span>107</span><span>+</span><span class="t">    },</span></div>
+<div class="dl added"><span>108</span><span>+</span><span class="t">    {</span></div>
+<div class="dl added"><span>109</span><span>+</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Observation&#x2f;obs-glucose-3-corrected&quot;,</span></div>
+<div class="dl added"><span>110</span><span>+</span><span class="t">      &quot;resource&quot;: {</span></div>
+<div class="dl added"><span>111</span><span>+</span><span class="t">        &quot;resourceType&quot;: &quot;Observation&quot;,</span></div>
+<div class="dl added"><span>112</span><span>+</span><span class="t">        &quot;id&quot;: &quot;obs-glucose-3-corrected&quot;,</span></div>
+<div class="dl added"><span>113</span><span>+</span><span class="t">        &quot;identifier&quot;: [</span></div>
+<div class="dl added"><span>114</span><span>+</span><span class="t">          {</span></div>
+<div class="dl added"><span>115</span><span>+</span><span class="t">            &quot;system&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;recordchaos&#x2f;lab-accession&quot;,</span></div>
+<div class="dl added"><span>116</span><span>+</span><span class="t">            &quot;value&quot;: &quot;ACC-1003&quot;</span></div>
+<div class="dl added"><span>117</span><span>+</span><span class="t">          }</span></div>
+<div class="dl added"><span>118</span><span>+</span><span class="t">        ],</span></div>
+<div class="dl added"><span>119</span><span>+</span><span class="t">        &quot;status&quot;: &quot;corrected&quot;,</span></div>
+<div class="dl added"><span>120</span><span>+</span><span class="t">        &quot;code&quot;: {</span></div>
+<div class="dl added"><span>121</span><span>+</span><span class="t">          &quot;coding&quot;: [</span></div>
+<div class="dl added"><span>122</span><span>+</span><span class="t">            {</span></div>
+<div class="dl added"><span>123</span><span>+</span><span class="t">              &quot;system&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;recordchaos&#x2f;codes&quot;,</span></div>
+<div class="dl added"><span>124</span><span>+</span><span class="t">              &quot;code&quot;: &quot;synthetic-glucose&quot;,</span></div>
+<div class="dl added"><span>125</span><span>+</span><span class="t">              &quot;display&quot;: &quot;Synthetic glucose&quot;</span></div>
+<div class="dl added"><span>126</span><span>+</span><span class="t">            }</span></div>
+<div class="dl added"><span>127</span><span>+</span><span class="t">          ],</span></div>
+<div class="dl added"><span>128</span><span>+</span><span class="t">          &quot;text&quot;: &quot;Synthetic glucose&quot;</span></div>
+<div class="dl added"><span>129</span><span>+</span><span class="t">        },</span></div>
+<div class="dl added"><span>130</span><span>+</span><span class="t">        &quot;subject&quot;: {</span></div>
+<div class="dl added"><span>131</span><span>+</span><span class="t">          &quot;reference&quot;: &quot;Patient&#x2f;pat-a&quot;</span></div>
+<div class="dl added"><span>132</span><span>+</span><span class="t">        },</span></div>
+<div class="dl added"><span>133</span><span>+</span><span class="t">        &quot;encounter&quot;: {</span></div>
+<div class="dl added"><span>134</span><span>+</span><span class="t">          &quot;reference&quot;: &quot;Encounter&#x2f;enc-a2&quot;</span></div>
+<div class="dl added"><span>135</span><span>+</span><span class="t">        },</span></div>
+<div class="dl added"><span>136</span><span>+</span><span class="t">        &quot;effectiveDateTime&quot;: &quot;2026-01-10T08:30:00Z&quot;,</span></div>
+<div class="dl added"><span>137</span><span>+</span><span class="t">        &quot;issued&quot;: &quot;2026-01-13T09:12:00Z&quot;,</span></div>
+<div class="dl added"><span>138</span><span>+</span><span class="t">        &quot;valueQuantity&quot;: {</span></div>
+<div class="dl added"><span>139</span><span>+</span><span class="t">          &quot;value&quot;: 6.1,</span></div>
+<div class="dl added"><span>140</span><span>+</span><span class="t">          &quot;unit&quot;: &quot;mmol&#x2f;L&quot;,</span></div>
+<div class="dl added"><span>141</span><span>+</span><span class="t">          &quot;system&quot;: &quot;http:&#x2f;&#x2f;unitsofmeasure.org&quot;,</span></div>
+<div class="dl added"><span>142</span><span>+</span><span class="t">          &quot;code&quot;: &quot;mmol&#x2f;L&quot;</span></div>
+<div class="dl added"><span>143</span><span>+</span><span class="t">        }</span></div>
+<div class="dl added"><span>144</span><span>+</span><span class="t">      }</span></div>
+<div class="dl context"><span>145</span><span></span><span class="t">    }</span></div>
+<div class="dl context"><span>146</span><span></span><span class="t">  ]</span></div>
+
+</div>
+</div>
+
+<div class="replay"><span class="cmd"><span class="prompt">$ </span><span class="c">recordchaos replay results&#x2f;cases&#x2f;c-0001</span></span><button type="button" data-copy="recordchaos replay results&#x2f;cases&#x2f;c-0001" hidden>Copy</button></div>
+</div>
+</div>
+</article>
+
+<article class="finding" id="f2">
+<div class="fhead">
+<span class="fid">F2</span>
+<span class="label fail rule"><span class="shape"></span>Rule broken</span>
+<span class="foracle">invalid_rejected</span>
+<span class="fcount">13 cases · c-0002, c-0011, c-0019, c-0023, c-0033 and 8 more · already minimal</span>
+</div>
+<h3>The importer accepted the bundle without rejecting or flagging it when a result reference pointed at a resource that is not in the bundle.</h3>
+<div class="fbody">
+<div class="fleft">
+<div class="facts">
+<span class="k">Expected</span><span class="v">rejected, or flagged at a declared view pointer</span>
+<span class="k">Got</span><span class="v">accepted (exit 0)</span>
+<span class="k">Mutation</span><span class="v"><code>reference.dangling_target field=result</code></span>
+<span class="k">Change</span><span class="v">DiagnosticReport&#x2f;dr-a1&#x2f;result&#x2f;2&#x2f;reference: Observation&#x2f;obs-protein-1 changed to Observation&#x2f;obs-protein-1-missing, which is not in the bundle</span>
+<span class="k">Shrunk</span><span class="v">6 entries not needed to fail were removed</span>
+<span class="k">Check</span><span class="v">Built in. Expects a rejected exit code, a 4xx response or a flag in the view</span>
+
+</div>
+<table class="layers">
+<caption>Validation of the shrunk bundle</caption>
+<tbody>
+<tr><td>R4 JSON schema 4.0.1</td><td class="r">Valid</td></tr>
+<tr><td>References inside the bundle</td><td class="r">1 broken</td></tr>
+<tr><td>HL7 validator</td><td class="r caution">Not run, add --strict</td></tr>
+
+</tbody>
+</table>
+<p class="why">This bundle is invalid. Accepting it silently stores a record that does not hold together.</p>
+</div>
+<div class="fright">
+
+<div class="diff">
+<div class="dhead"><span class="dlabel">DiagnosticReport&#x2f;dr-a1&#x2f;result&#x2f;2&#x2f;reference</span><span class="dcount">1 path changed</span></div>
+<div class="dbody" role="group" aria-label="Diff of the shrunk bundle against the base bundle">
+<div class="dl context"><span>214</span><span></span><span class="t">          },</span></div>
+<div class="dl context"><span>215</span><span></span><span class="t">          {</span></div>
+<div class="dl removed"><span>216</span><span>−</span><span class="t">            &quot;reference&quot;: &quot;Observation&#x2f;obs-protein-1&quot;</span></div>
+<div class="dl added"><span>216</span><span>+</span><span class="t">            &quot;reference&quot;: &quot;Observation&#x2f;obs-protein-1-missing&quot;</span></div>
+<div class="dl context"><span>217</span><span></span><span class="t">          }</span></div>
+<div class="dl context"><span>218</span><span></span><span class="t">        ],</span></div>
+
+</div>
+</div>
+
+<div class="replay"><span class="cmd"><span class="prompt">$ </span><span class="c">recordchaos replay results&#x2f;cases&#x2f;c-0019</span></span><button type="button" data-copy="recordchaos replay results&#x2f;cases&#x2f;c-0019" hidden>Copy</button></div>
+</div>
+</div>
+</article>
+
+<article class="finding" id="f3">
+<div class="fhead">
+<span class="fid">F3</span>
+<span class="label fail crashed"><span class="shape"></span>Crashed</span>
+<span class="foracle">no_crash</span>
+<span class="fcount">24 cases · c-0004, c-0005, c-0008, c-0010, c-0018 and 19 more · already minimal</span>
+</div>
+<h3>The importer exited with code 101 when the Patient reference used a urn:uuid.</h3>
+<div class="fbody">
+<div class="fleft">
+<div class="facts">
+<span class="k">Expected</span><span class="v">exit 0 or a rejected exit code</span>
+<span class="k">Got</span><span class="v">exit 101: thread &#x27;main&#x27; panicked at crates&#x2f;recordchaos-cli&#x2f;examples&#x2f;buggy_importer.rs:164:13:</span>
+<span class="k">Mutation</span><span class="v"><code>reference.to_urn_uuid resource_type=Patient</code></span>
+<span class="k">Change</span><span class="v">Patient&#x2f;pat-a: fullUrl set to urn:uuid:d1083aff-f2a0-4867-8be2-c7f38659e900, 10 references rewritten the same way</span>
+<span class="k">Shrunk</span><span class="v">10 entries not needed to fail were removed</span>
+<span class="k">Check</span><span class="v">Built in. Reads the exit code or HTTP status of every step</span>
+
+</div>
+<table class="layers">
+<caption>Validation of the shrunk bundle</caption>
+<tbody>
+<tr><td>R4 JSON schema 4.0.1</td><td class="r">Valid</td></tr>
+<tr><td>References inside the bundle</td><td class="r">All resolve</td></tr>
+<tr><td>HL7 validator</td><td class="r caution">Not run, add --strict</td></tr>
+
+</tbody>
+</table>
+<p class="why">Transaction bundles from many EHR exports use urn:uuid full URLs. The bundle is valid FHIR.</p>
+</div>
+<div class="fright">
+
+<div class="diff">
+<div class="dhead"><span class="dlabel">Patient&#x2f;pat-a</span><span class="dcount">11 paths changed</span></div>
+<div class="dbody" role="group" aria-label="Diff of the shrunk bundle against the base bundle">
+<div class="dl context"><span>15</span><span></span><span class="t">  &quot;entry&quot;: [</span></div>
+<div class="dl context"><span>16</span><span></span><span class="t">    {</span></div>
+<div class="dl removed"><span>17</span><span>−</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Patient&#x2f;pat-a&quot;,</span></div>
+<div class="dl added"><span>17</span><span>+</span><span class="t">      &quot;fullUrl&quot;: &quot;urn:uuid:d1083aff-f2a0-4867-8be2-c7f38659e900&quot;,</span></div>
+<div class="dl context"><span>18</span><span></span><span class="t">      &quot;resource&quot;: {</span></div>
+<div class="dl context"><span>19</span><span></span><span class="t">        &quot;resourceType&quot;: &quot;Patient&quot;,</span></div>
+<div class="dl gap"><span></span><span></span><span class="t">…</span></div>
+<div class="dl context"><span>60</span><span></span><span class="t">        },</span></div>
+<div class="dl context"><span>61</span><span></span><span class="t">        &quot;subject&quot;: {</span></div>
+<div class="dl removed"><span>62</span><span>−</span><span class="t">          &quot;reference&quot;: &quot;Patient&#x2f;pat-a&quot;</span></div>
+<div class="dl added"><span>62</span><span>+</span><span class="t">          &quot;reference&quot;: &quot;urn:uuid:d1083aff-f2a0-4867-8be2-c7f38659e900&quot;</span></div>
+<div class="dl context"><span>63</span><span></span><span class="t">        },</span></div>
+<div class="dl context"><span>64</span><span></span><span class="t">        &quot;period&quot;: {</span></div>
+
+</div>
+</div>
+
+<div class="replay"><span class="cmd"><span class="prompt">$ </span><span class="c">recordchaos replay results&#x2f;cases&#x2f;c-0005</span></span><button type="button" data-copy="recordchaos replay results&#x2f;cases&#x2f;c-0005" hidden>Copy</button></div>
+</div>
+</div>
+</article>
+
+<article class="finding" id="f4">
+<div class="fhead">
+<span class="fid">F4</span>
+<span class="label fail rule"><span class="shape"></span>Rule broken</span>
+<span class="foracle">same_as_base</span>
+<span class="fcount">5 cases · c-0014, c-0017, c-0046, c-0061, c-0074 · already minimal</span>
+</div>
+<h3>The importer reported a different latest_glucose when the entries were in a different order.</h3>
+<div class="fbody">
+<div class="fleft">
+<div class="facts">
+<span class="k">Expected</span><span class="v">latest_glucose = 7.2 from Observation&#x2f;obs-glucose-3</span>
+<span class="k">Got</span><span class="v">latest_glucose = 6.8 from Observation&#x2f;obs-glucose-2</span>
+<span class="k">Mutation</span><span class="v"><code>bundle.reorder_entries</code></span>
+<span class="k">Change</span><span class="v">entries shuffled, 9 of 12 in a new position</span>
+<span class="k">Shrunk</span><span class="v">8 entries not needed to fail were removed</span>
+<span class="k">Check</span><span class="v">Built in. Reads &#x2f;latest&#x2f;synthetic-glucose from your target&#x27;s view</span>
+
+</div>
+<table class="layers">
+<caption>Validation of the shrunk bundle</caption>
+<tbody>
+<tr><td>R4 JSON schema 4.0.1</td><td class="r">Valid</td></tr>
+<tr><td>References inside the bundle</td><td class="r">All resolve</td></tr>
+<tr><td>HL7 validator</td><td class="r caution">Not run, add --strict</td></tr>
+
+</tbody>
+</table>
+<p class="why">Likely cause: the importer treats bundle order as time order. FHIR gives entry order no meaning in a collection bundle.</p>
+</div>
+<div class="fright">
+
+<div class="diff">
+<div class="dhead"><span class="dlabel">bundle</span><span class="dcount">7 paths changed</span></div>
+<div class="dbody" role="group" aria-label="Diff of the shrunk bundle against the base bundle">
+<div class="dl context"><span>69</span><span></span><span class="t">    },</span></div>
+<div class="dl context"><span>70</span><span></span><span class="t">    {</span></div>
+<div class="dl removed"><span>71</span><span>−</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Observation&#x2f;obs-glucose-2&quot;,</span></div>
+<div class="dl added"><span>71</span><span>+</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Observation&#x2f;obs-glucose-3&quot;,</span></div>
+<div class="dl context"><span>72</span><span></span><span class="t">      &quot;resource&quot;: {</span></div>
+<div class="dl context"><span>73</span><span></span><span class="t">        &quot;resourceType&quot;: &quot;Observation&quot;,</span></div>
+<div class="dl removed"><span>74</span><span>−</span><span class="t">        &quot;id&quot;: &quot;obs-glucose-2&quot;,</span></div>
+<div class="dl added"><span>74</span><span>+</span><span class="t">        &quot;id&quot;: &quot;obs-glucose-3&quot;,</span></div>
+<div class="dl context"><span>75</span><span></span><span class="t">        &quot;identifier&quot;: [</span></div>
+<div class="dl context"><span>76</span><span></span><span class="t">          {</span></div>
+<div class="dl context"><span>77</span><span></span><span class="t">            &quot;system&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;recordchaos&#x2f;lab-accession&quot;,</span></div>
+<div class="dl removed"><span>78</span><span>−</span><span class="t">            &quot;value&quot;: &quot;ACC-1002&quot;</span></div>
+<div class="dl added"><span>78</span><span>+</span><span class="t">            &quot;value&quot;: &quot;ACC-1003&quot;</span></div>
+<div class="dl context"><span>79</span><span></span><span class="t">          }</span></div>
+<div class="dl context"><span>80</span><span></span><span class="t">        ],</span></div>
+<div class="dl gap"><span></span><span></span><span class="t">…</span></div>
+<div class="dl context"><span>93</span><span></span><span class="t">          &quot;reference&quot;: &quot;Patient&#x2f;pat-a&quot;</span></div>
+<div class="dl context"><span>94</span><span></span><span class="t">        },</span></div>
+<div class="dl removed"><span>95</span><span>−</span><span class="t">        &quot;effectiveDateTime&quot;: &quot;2026-01-06T08:30:00Z&quot;,</span></div>
+<div class="dl removed"><span>96</span><span>−</span><span class="t">        &quot;issued&quot;: &quot;2026-01-06T09:12:00Z&quot;,</span></div>
+<div class="dl added"><span>95</span><span>+</span><span class="t">        &quot;encounter&quot;: {</span></div>
+<div class="dl added"><span>96</span><span>+</span><span class="t">          &quot;reference&quot;: &quot;Encounter&#x2f;enc-a2&quot;</span></div>
+<div class="dl added"><span>97</span><span>+</span><span class="t">        },</span></div>
+<div class="dl added"><span>98</span><span>+</span><span class="t">        &quot;effectiveDateTime&quot;: &quot;2026-01-10T08:30:00Z&quot;,</span></div>
+<div class="dl added"><span>99</span><span>+</span><span class="t">        &quot;issued&quot;: &quot;2026-01-10T09:12:00Z&quot;,</span></div>
+<div class="dl context"><span>100</span><span></span><span class="t">        &quot;valueQuantity&quot;: {</span></div>
+<div class="dl removed"><span>98</span><span>−</span><span class="t">          &quot;value&quot;: 6.8,</span></div>
+<div class="dl added"><span>101</span><span>+</span><span class="t">          &quot;value&quot;: 7.2,</span></div>
+<div class="dl context"><span>102</span><span></span><span class="t">          &quot;unit&quot;: &quot;mmol&#x2f;L&quot;,</span></div>
+<div class="dl context"><span>103</span><span></span><span class="t">          &quot;system&quot;: &quot;http:&#x2f;&#x2f;unitsofmeasure.org&quot;,</span></div>
+<div class="dl gap"><span></span><span></span><span class="t">…</span></div>
+<div class="dl context"><span>107</span><span></span><span class="t">    },</span></div>
+<div class="dl context"><span>108</span><span></span><span class="t">    {</span></div>
+<div class="dl removed"><span>106</span><span>−</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Observation&#x2f;obs-glucose-3&quot;,</span></div>
+<div class="dl added"><span>109</span><span>+</span><span class="t">      &quot;fullUrl&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;fhir&#x2f;Observation&#x2f;obs-glucose-2&quot;,</span></div>
+<div class="dl context"><span>110</span><span></span><span class="t">      &quot;resource&quot;: {</span></div>
+<div class="dl context"><span>111</span><span></span><span class="t">        &quot;resourceType&quot;: &quot;Observation&quot;,</span></div>
+<div class="dl removed"><span>109</span><span>−</span><span class="t">        &quot;id&quot;: &quot;obs-glucose-3&quot;,</span></div>
+<div class="dl added"><span>112</span><span>+</span><span class="t">        &quot;id&quot;: &quot;obs-glucose-2&quot;,</span></div>
+<div class="dl context"><span>113</span><span></span><span class="t">        &quot;identifier&quot;: [</span></div>
+<div class="dl context"><span>114</span><span></span><span class="t">          {</span></div>
+<div class="dl context"><span>115</span><span></span><span class="t">            &quot;system&quot;: &quot;https:&#x2f;&#x2f;example.org&#x2f;recordchaos&#x2f;lab-accession&quot;,</span></div>
+<div class="dl removed"><span>113</span><span>−</span><span class="t">            &quot;value&quot;: &quot;ACC-1003&quot;</span></div>
+<div class="dl added"><span>116</span><span>+</span><span class="t">            &quot;value&quot;: &quot;ACC-1002&quot;</span></div>
+<div class="dl context"><span>117</span><span></span><span class="t">          }</span></div>
+<div class="dl context"><span>118</span><span></span><span class="t">        ],</span></div>
+<div class="dl gap"><span></span><span></span><span class="t">…</span></div>
+<div class="dl context"><span>131</span><span></span><span class="t">          &quot;reference&quot;: &quot;Patient&#x2f;pat-a&quot;</span></div>
+<div class="dl context"><span>132</span><span></span><span class="t">        },</span></div>
+<div class="dl removed"><span>130</span><span>−</span><span class="t">        &quot;encounter&quot;: {</span></div>
+<div class="dl removed"><span>131</span><span>−</span><span class="t">          &quot;reference&quot;: &quot;Encounter&#x2f;enc-a2&quot;</span></div>
+<div class="dl removed"><span>132</span><span>−</span><span class="t">        },</span></div>
+<div class="dl removed"><span>133</span><span>−</span><span class="t">        &quot;effectiveDateTime&quot;: &quot;2026-01-10T08:30:00Z&quot;,</span></div>
+<div class="dl removed"><span>134</span><span>−</span><span class="t">        &quot;issued&quot;: &quot;2026-01-10T09:12:00Z&quot;,</span></div>
+<div class="dl added"><span>133</span><span>+</span><span class="t">        &quot;effectiveDateTime&quot;: &quot;2026-01-06T08:30:00Z&quot;,</span></div>
+<div class="dl added"><span>134</span><span>+</span><span class="t">        &quot;issued&quot;: &quot;2026-01-06T09:12:00Z&quot;,</span></div>
+<div class="dl context"><span>135</span><span></span><span class="t">        &quot;valueQuantity&quot;: {</span></div>
+<div class="dl removed"><span>136</span><span>−</span><span class="t">          &quot;value&quot;: 7.2,</span></div>
+<div class="dl added"><span>136</span><span>+</span><span class="t">          &quot;value&quot;: 6.8,</span></div>
+<div class="dl context"><span>137</span><span></span><span class="t">          &quot;unit&quot;: &quot;mmol&#x2f;L&quot;,</span></div>
+<div class="dl gap"><span></span><span></span><span class="t">… 7 more lines in bundle.json</span></div>
+
+</div>
+</div>
+
+<div class="replay"><span class="cmd"><span class="prompt">$ </span><span class="c">recordchaos replay results&#x2f;cases&#x2f;c-0014</span></span><button type="button" data-copy="recordchaos replay results&#x2f;cases&#x2f;c-0014" hidden>Copy</button></div>
+</div>
+</div>
+</article>
+
+</section>
+
+<section aria-labelledby="cases">
+<div class="tablehead">
+<h2 id="cases">All 80 Cases</h2>
+<div class="filters" hidden>
+<button type="button" aria-pressed="true" data-filter="all">All</button>
+<button type="button" aria-pressed="false" data-filter="failed">Failed 67</button>
+<button type="button" aria-pressed="false" data-filter="invalid">Expected invalid 26</button>
+</div>
+</div>
+<div class="tablewrap">
+<table class="cases">
+<thead><tr><th scope="col">Case</th><th scope="col">Mutation</th><th scope="col">Intended</th><th scope="col">Schema</th><th scope="col">References</th><th scope="col">HL7 validator</th><th scope="col">Importer</th></tr></thead>
+<tbody>
+<tr id="c-0001" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0001</a></td>
+<td class="mono">observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0002" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0002</a></td>
+<td class="mono">quantity.equivalent_unit, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0003" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0003</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0004" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0004</a></td>
+<td class="mono">reference.to_urn_uuid, quantity.equivalent_unit, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0005" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0005</a></td>
+<td class="mono">reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0006" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0006</a></td>
+<td class="mono">bundle.reorder_entries, observation.correction_sequence</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0007" data-tags="all">
+<td class="mono id">c-0007</td>
+<td class="mono">text.unicode_narrative</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0008" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0008</a></td>
+<td class="mono">reference.to_urn_uuid, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0009" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0009</a></td>
+<td class="mono">observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0010" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0010</a></td>
+<td class="mono">reference.to_urn_uuid, quantity.equivalent_unit</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0011" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0011</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0012" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0012</a></td>
+<td class="mono">bundle.reorder_entries, observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0013" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0013</a></td>
+<td class="mono">observation.correction_sequence, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0014" data-tags="all failed">
+<td class="mono id"><a href="#f4">c-0014</a></td>
+<td class="mono">bundle.reorder_entries</td>
+<td>Valid, no change in meaning</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F4</td>
+</tr>
+<tr id="c-0015" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0015</a></td>
+<td class="mono">observation.correction_sequence, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0016" data-tags="all">
+<td class="mono id">c-0016</td>
+<td class="mono">text.unicode_narrative</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0017" data-tags="all failed">
+<td class="mono id"><a href="#f4">c-0017</a></td>
+<td class="mono">bundle.reorder_entries</td>
+<td>Valid, no change in meaning</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F4</td>
+</tr>
+<tr id="c-0018" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0018</a></td>
+<td class="mono">reference.to_urn_uuid, quantity.equivalent_unit, observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0019" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0019</a></td>
+<td class="mono">reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0020" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0020</a></td>
+<td class="mono">time.timezone_offset_shift, reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0021" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0021</a></td>
+<td class="mono">bundle.reorder_entries, observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0022" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0022</a></td>
+<td class="mono">bundle.reorder_entries, reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0023" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0023</a></td>
+<td class="mono">reference.dangling_target, quantity.equivalent_unit</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0024" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0024</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, reference.dangling_target, reference.to_urn_uuid</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0025" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0025</a></td>
+<td class="mono">reference.to_urn_uuid, observation.duplicate_with_changed_issued, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0026" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0026</a></td>
+<td class="mono">reference.to_urn_uuid, time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0027" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0027</a></td>
+<td class="mono">reference.to_urn_uuid, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0028" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0028</a></td>
+<td class="mono">observation.correction_sequence</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0029" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0029</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, reference.dangling_target, reference.to_urn_uuid</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0030" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0030</a></td>
+<td class="mono">reference.dangling_target, bundle.reorder_entries, reference.to_urn_uuid</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0031" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0031</a></td>
+<td class="mono">reference.to_urn_uuid, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0032" data-tags="all">
+<td class="mono id">c-0032</td>
+<td class="mono">time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0033" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0033</a></td>
+<td class="mono">reference.dangling_target, text.unicode_narrative</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0034" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0034</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries, reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0035" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0035</a></td>
+<td class="mono">observation.correction_sequence</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0036" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0036</a></td>
+<td class="mono">bundle.reorder_entries, observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0037" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0037</a></td>
+<td class="mono">observation.correction_sequence</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0038" data-tags="all">
+<td class="mono id">c-0038</td>
+<td class="mono">time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0039" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0039</a></td>
+<td class="mono">bundle.reorder_entries, reference.to_urn_uuid, observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0040" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0040</a></td>
+<td class="mono">reference.to_urn_uuid, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0041" data-tags="all">
+<td class="mono id">c-0041</td>
+<td class="mono">text.unicode_narrative</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0042" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0042</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, quantity.equivalent_unit</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0043" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0043</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0044" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0044</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0045" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0045</a></td>
+<td class="mono">reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0046" data-tags="all failed">
+<td class="mono id"><a href="#f4">c-0046</a></td>
+<td class="mono">bundle.reorder_entries</td>
+<td>Valid, no change in meaning</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F4</td>
+</tr>
+<tr id="c-0047" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0047</a></td>
+<td class="mono">reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0048" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0048</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries, time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0049" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0049</a></td>
+<td class="mono">observation.correction_sequence, bundle.reorder_entries, text.unicode_narrative</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0050" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0050</a></td>
+<td class="mono">observation.correction_sequence, quantity.equivalent_unit</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0051" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0051</a></td>
+<td class="mono">reference.dangling_target, reference.to_urn_uuid</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0052" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0052</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0053" data-tags="all invalid">
+<td class="mono id">c-0053</td>
+<td class="mono">observation.correction_sequence, observation.remove_code</td>
+<td>Invalid</td>
+<td>Invalid, 2 issues</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Rejected, exit 2</td>
+</tr>
+<tr id="c-0054" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0054</a></td>
+<td class="mono">observation.correction_sequence, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0055" data-tags="all">
+<td class="mono id">c-0055</td>
+<td class="mono">quantity.equivalent_unit</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0056" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0056</a></td>
+<td class="mono">quantity.equivalent_unit, observation.correction_sequence, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0057" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0057</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0058" data-tags="all invalid">
+<td class="mono id">c-0058</td>
+<td class="mono">observation.duplicate_with_changed_issued, quantity.equivalent_unit, observation.remove_code</td>
+<td>Invalid</td>
+<td>Invalid, 2 issues</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Rejected, exit 2</td>
+</tr>
+<tr id="c-0059" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0059</a></td>
+<td class="mono">reference.to_urn_uuid</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0060" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0060</a></td>
+<td class="mono">bundle.reorder_entries, observation.duplicate_with_changed_issued</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0061" data-tags="all failed">
+<td class="mono id"><a href="#f4">c-0061</a></td>
+<td class="mono">text.unicode_narrative, text.unicode_narrative, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F4</td>
+</tr>
+<tr id="c-0062" data-tags="all invalid">
+<td class="mono id">c-0062</td>
+<td class="mono">observation.remove_code, bundle.reorder_entries</td>
+<td>Invalid</td>
+<td>Invalid, 2 issues</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Rejected, exit 2</td>
+</tr>
+<tr id="c-0063" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0063</a></td>
+<td class="mono">observation.correction_sequence, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0064" data-tags="all failed">
+<td class="mono id"><a href="#f3">c-0064</a></td>
+<td class="mono">reference.to_urn_uuid, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0065" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0065</a></td>
+<td class="mono">bundle.reorder_entries, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0066" data-tags="all">
+<td class="mono id">c-0066</td>
+<td class="mono">time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0067" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0067</a></td>
+<td class="mono">reference.dangling_target, observation.correction_sequence</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0068" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0068</a></td>
+<td class="mono">observation.correction_sequence, text.unicode_narrative</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0069" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0069</a></td>
+<td class="mono">observation.correction_sequence</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0070" data-tags="all failed invalid">
+<td class="mono id"><a href="#f3">c-0070</a></td>
+<td class="mono">reference.to_urn_uuid, reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Crashed, exit 101 · F3</td>
+</tr>
+<tr id="c-0071" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0071</a></td>
+<td class="mono">reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0072" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0072</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0073" data-tags="all invalid">
+<td class="mono id">c-0073</td>
+<td class="mono">reference.to_urn_uuid, observation.remove_code, observation.remove_code</td>
+<td>Invalid</td>
+<td>Invalid, 4 issues</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Rejected, exit 2</td>
+</tr>
+<tr id="c-0074" data-tags="all failed">
+<td class="mono id"><a href="#f4">c-0074</a></td>
+<td class="mono">bundle.reorder_entries</td>
+<td>Valid, no change in meaning</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F4</td>
+</tr>
+<tr id="c-0075" data-tags="all">
+<td class="mono id">c-0075</td>
+<td class="mono">time.timezone_offset_shift</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Handled</td>
+</tr>
+<tr id="c-0076" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0076</a></td>
+<td class="mono">reference.dangling_target</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0077" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0077</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0078" data-tags="all failed">
+<td class="mono id"><a href="#f1">c-0078</a></td>
+<td class="mono">observation.duplicate_with_changed_issued, bundle.reorder_entries</td>
+<td>Valid, edge case</td>
+<td>Valid</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F1</td>
+</tr>
+<tr id="c-0079" data-tags="all failed invalid">
+<td class="mono id"><a href="#f2">c-0079</a></td>
+<td class="mono">reference.dangling_target, quantity.equivalent_unit, observation.duplicate_with_changed_issued</td>
+<td>Invalid</td>
+<td>Valid</td>
+<td>1 broken</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap bad">Rule broken · F2</td>
+</tr>
+<tr id="c-0080" data-tags="all invalid">
+<td class="mono id">c-0080</td>
+<td class="mono">observation.remove_code</td>
+<td>Invalid</td>
+<td>Invalid, 2 issues</td>
+<td>All resolve</td>
+<td class="nowrap warn">Not run</td>
+<td class="nowrap">Rejected, exit 2</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<div class="tablenote">Every case is in this table. The filter buttons need scripts; with scripts off, every row shows.</div>
+</section>
+
+<section aria-labelledby="notchecked">
+<h2 id="notchecked">What This Run Did Not Check</h2>
+<div class="notchecked">
+<div><h3>Invariants and required fields</h3><p>The R4 JSON schema does not require Observation.status or check that a period starts before it ends. Only the HL7 validator does. Run with --strict to include it.</p></div>
+<div><h3>Terminology</h3><p>Codes are synthetic and are never checked against a terminology server.</p></div>
+<div><h3>Clinical sense</h3><p>A passing run says the importer copes with these shapes of data. It says nothing about clinical correctness.</p></div>
+<div><h3>Checks that could not run</h3><p>28 oracle checks were not run on some cases, each with its reason in results.json. They are never counted as passed.</p></div>
+
+</div>
+</section>
+</main>
+
+<footer class="bottom"><div class="wrap">
+<span>recordchaos 0.1.0 · results&#x2f;report.html · inputs 458e…7ff3, scenario 2804…982d · <strong>Synthetic test data only</strong></span>
+<span>Built by <a href="https://logitsolutions.ai/guides/ai-in-medical-practices/">Logit Solutions AI</a></span>
+</div></footer>
+
+<script>
+(function(){
+  var buttons=document.querySelectorAll('[data-filter]');
+  var wrap=document.querySelector('.filters');
+  if(wrap){wrap.hidden=false;}
+  Array.prototype.forEach.call(buttons,function(b){
+    b.addEventListener('click',function(){
+      var f=b.getAttribute('data-filter');
+      Array.prototype.forEach.call(buttons,function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+      Array.prototype.forEach.call(document.querySelectorAll('tr[data-tags]'),function(r){
+        var tags=' '+r.getAttribute('data-tags')+' ';
+        r.hidden=!(f==='all'||tags.indexOf(' '+f+' ')>=0);
+      });
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
+    if(!navigator.clipboard){return;}
+    b.hidden=false;
+    b.addEventListener('click',function(){
+      navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy';},1500);});
+    });
+  });
+})();
+</script>
+</body>
+</html>

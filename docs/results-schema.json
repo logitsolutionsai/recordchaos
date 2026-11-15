@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/logitsolutionsai/recordchaos/docs/results-schema.json",
+  "title": "recordchaos results.json",
+  "description": "Every case and finding of one recordchaos run. Format version 1. Hand-written for v0.1 to match crates/recordchaos-core/src/results.rs; timestamps and timings are not in this file (they are in run.toml).",
+  "type": "object",
+  "required": ["format_version", "tool", "tool_version", "rng", "seed", "fhir_version", "scenario", "base", "target", "as_of", "layers", "operators", "registry_size", "out_dir", "summary", "cases", "findings", "not_checked"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "tool": { "const": "recordchaos" },
+    "tool_version": { "type": "string" },
+    "rng": { "type": "string", "description": "The random number generator and its crate version." },
+    "seed": { "type": "integer", "minimum": 0 },
+    "fhir_version": { "const": "4.0.1" },
+    "scenario": { "$ref": "#/$defs/input" },
+    "base": { "$ref": "#/$defs/input" },
+    "target": {
+      "type": "object",
+      "required": ["path", "sha256", "kind", "describe"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "kind": { "enum": ["command", "http", "python"] },
+        "describe": { "type": "string" }
+      }
+    },
+    "as_of": { "type": "string", "format": "date" },
+    "layers": {
+      "type": "object",
+      "required": ["schema", "references", "strict"],
+      "properties": { "schema": { "type": "boolean" }, "references": { "type": "boolean" }, "strict": { "type": "boolean" } }
+    },
+    "operators": { "type": "array", "items": { "type": "string" } },
+    "registry_size": { "type": "integer" },
+    "out_dir": { "type": "string" },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "cases": { "type": "integer" }, "ran": { "type": "integer" }, "handled": { "type": "integer" },
+        "rejected_cleanly": { "type": "integer" }, "rule_broken": { "type": "integer" }, "crashed": { "type": "integer" },
+        "not_applicable": { "type": "integer" }, "failed": { "type": "integer" }, "expected_invalid": { "type": "integer" },
+        "unexpected_validity": { "type": "integer" }, "unexpected_invalidity": { "type": "integer" },
+        "valid_edge_cases": { "type": "integer" }, "valid_edge_schema_valid": { "type": "integer" },
+        "findings": { "type": "integer" }, "shrink_replays": { "type": "integer" }
+      }
+    },
+    "cases": { "type": "array", "items": { "$ref": "#/$defs/case" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "not_checked": {
+      "type": "array",
+      "items": { "type": "object", "required": ["title", "text"], "properties": { "title": { "type": "string" }, "text": { "type": "string" } } }
+    }
+  },
+  "$defs": {
+    "input": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": { "path": { "type": "string" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+    },
+    "intent": { "enum": ["valid_edge", "valid_meaning_kept", "invalid"] },
+    "outcome": { "enum": ["handled", "rejected_cleanly", "rule_broken", "crashed", "not_applicable"] },
+    "layer": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["valid", "invalid", "not_checked"] },
+        "issues": {
+          "type": "array",
+          "items": { "type": "object", "required": ["path", "message"], "properties": { "path": { "type": "string" }, "message": { "type": "string" } } }
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["schema", "references", "strict"],
+      "properties": { "schema": { "$ref": "#/$defs/layer" }, "references": { "$ref": "#/$defs/layer" }, "strict": { "$ref": "#/$defs/layer" } }
+    },
+    "effect": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["same_as_base", "same_as_base_or_rejected", "latest_correction", "invalid", "cross_patient", "no_crash_only"] },
+        "code": { "type": "string" }, "id": { "type": "string" }, "value": {}, "unit": { "type": "string" },
+        "issued": { "type": "string" }, "old_id": { "type": "string" }, "old_value": {}, "old_issued": { "type": "string" },
+        "match_id": { "type": "boolean" }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "required": ["operator", "version", "target", "args", "seed", "summary", "intent", "effect", "patch_ops"],
+      "properties": {
+        "operator": { "type": "string" },
+        "version": { "type": "integer" },
+        "target": { "type": "object", "properties": { "key": { "type": "string" }, "path": { "type": "string" } } },
+        "args": { "type": "object" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "summary": { "type": "string" },
+        "intent": { "$ref": "#/$defs/intent" },
+        "effect": { "$ref": "#/$defs/effect" },
+        "patch_ops": { "type": "integer" }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["accepted", "rejected", "crashed", "timeout"] },
+        "code": { "type": "integer" },
+        "http": { "type": "boolean" },
+        "first_line": { "type": "string" },
+        "operation_outcome": { "type": "boolean" }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "required": ["oracle", "status"],
+      "properties": {
+        "oracle": { "type": "string" },
+        "status": { "enum": ["pass", "fail", "not_checked"] },
+        "expected": { "type": "string" }, "got": { "type": "string" }, "detail": { "type": "string" },
+        "key": { "type": "string" }, "user": { "type": "boolean" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "required": ["id", "seed", "mutations", "intent", "validation", "outcome", "oracles"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^c-[0-9]{4,}$" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "mutations": { "type": "array", "items": { "$ref": "#/$defs/mutation" } },
+        "not_applicable": { "type": "array", "items": { "type": "string" } },
+        "intent": { "$ref": "#/$defs/intent" },
+        "validation": { "$ref": "#/$defs/validation" },
+        "validity_note": { "type": "string" },
+        "outcome": { "$ref": "#/$defs/outcome" },
+        "step": { "$ref": "#/$defs/step" },
+        "oracles": { "type": "array", "items": { "$ref": "#/$defs/oracle" } },
+        "finding": { "type": "string" },
+        "fingerprint": { "type": "string" },
+        "dir": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "oracle", "kind", "fingerprint", "sentence", "cases", "representative", "mutations_before", "mutations_after", "entries_removed", "shrink_replays", "flaky", "check", "mutations", "validation", "diff_title", "diff", "replay"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^F[0-9]+$" },
+        "oracle": { "type": "string" },
+        "kind": { "enum": ["crashed", "rule_broken"] },
+        "fingerprint": { "type": "string", "description": "oracle|kind|exit code or HTTP class|FNV-1a hash of the first error line" },
+        "sentence": { "type": "string" },
+        "cases": { "type": "array", "items": { "type": "string" } },
+        "representative": { "type": "string" },
+        "mutations_before": { "type": "integer" },
+        "mutations_after": { "type": "integer" },
+        "entries_removed": { "type": "integer" },
+        "shrink_replays": { "type": "integer" },
+        "flaky": { "type": "boolean" },
+        "reproduced": { "type": "string" },
+        "expected": { "type": "string" },
+        "got": { "type": "string" },
+        "check": { "type": "string" },
+        "mutations": { "type": "array", "items": { "$ref": "#/$defs/mutation" } },
+        "validation": { "$ref": "#/$defs/validation" },
+        "diff_title": { "type": "string" },
+        "diff": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "text"],
+            "properties": { "kind": { "enum": ["context", "added", "removed", "gap"] }, "line": { "type": "integer" }, "text": { "type": "string" } }
+          }
+        },
+        "replay": { "type": "string" },
+        "first_line": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# Steps that dist runs before `dist build` in the release workflow
+# (dist-workspace.toml: github-build-setup). They write
+# THIRD-PARTY-LICENSES.html, which dist copies into every archive
+# (dist-workspace.toml: include). The file is not committed.
+- name: Install cargo-about
+  uses: taiki-e/install-action@v2
+  with:
+    tool: cargo-about@0.9.3
+- name: Write THIRD-PARTY-LICENSES.html
+  run: cargo about generate about.hbs -o THIRD-PARTY-LICENSES.html

@@ -1,0 +1,30 @@
+[package]
+name = "recordchaos-core"
+description = "Core engine of recordchaos: mutates synthetic HL7 FHIR R4 bundles, validates them, runs them against an importer and shrinks failures."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "../../README.md"
+# The bundled R4 schema (unmodified) and its NOTICE live in this crate, so
+# the published package carries them.
+include = ["src/**", "schemas/fhir-r4/fhir.schema.json", "schemas/fhir-r4/NOTICE", "Cargo.toml"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+jsonschema.workspace = true
+rand_chacha.workspace = true
+ureq.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

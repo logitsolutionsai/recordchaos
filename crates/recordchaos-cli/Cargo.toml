@@ -1,0 +1,49 @@
+[package]
+name = "recordchaos"
+description = "recordchaos: breaks synthetic patient record bundles (for HL7 FHIR R4) on purpose to test your importer, and shrinks every failure."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage = "https://github.com/logitsolutionsai/recordchaos#readme"
+authors.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "../../README.md"
+default-run = "recordchaos"
+# The integration tests read fixtures/ and scenarios/ at the repository root,
+# so they stay out of the published package.
+include = ["src/**", "examples/buggy_importer.rs", "assets/starter-bundle.json", "Cargo.toml"]
+
+[[bin]]
+name = "recordchaos"
+path = "src/main.rs"
+
+# The deliberately buggy importer used by the demo and the integration tests.
+# Built to target/debug/examples/buggy_importer by `cargo build --example buggy_importer`
+# (and by `cargo test`, which builds examples).
+[[example]]
+name = "buggy_importer"
+path = "examples/buggy_importer.rs"
+
+[dependencies]
+recordchaos-core.workspace = true
+recordchaos-report.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+# Snapshots of the demo's terminal output and report.html; `filters` hides
+# timings, hashes and font data.
+insta = { version = "1.43", features = ["filters"] }
+# Checks results.json against docs/results-schema.json.
+jsonschema.workspace = true
+
+[lints]
+workspace = true
+
+[package.metadata.dist]
+dist = true

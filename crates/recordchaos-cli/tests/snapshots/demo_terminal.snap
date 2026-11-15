@@ -1,0 +1,29 @@
+---
+source: crates/recordchaos-cli/tests/demo.rs
+expression: text
+---
+$ recordchaos --color never run scenarios/demo.toml --target buggy.toml --out results --jobs 2
+recordchaos 0.1.0 · seed 20261114 · base fixtures/bundles/patient-a.json ([HASH])
+
+generate  80 cases from 9 operators  [TIME]
+validate  schema 75/80 · references 59/80 · strict not run (add --strict)
+baseline  [IMPORTER] --state state.json ingest · view captured  [TIME]
+run       80 cases  [TIME]
+          ✓ 8 handled   ✓ 5 rejected cleanly   ✗ 43 rule broken   ✗ 24 crashed
+shrink    67 failures, 56 replays  [TIME]
+
+✗ F1  latest_correction_selected   25 cases  already minimal
+      The importer kept the older reading when a correction arrived 3 days later.
+      recordchaos replay results/cases/c-0001
+✗ F2  invalid_rejected             13 cases  already minimal
+      The importer accepted the bundle without rejecting or flagging it when a result reference pointed at a resource that is not in the bundle.
+      recordchaos replay results/cases/c-0019
+✗ F3  no_crash                     24 cases  already minimal
+      The importer exited with code 101 when the Patient reference used a urn:uuid.
+      recordchaos replay results/cases/c-0005
+✗ F4  same_as_base                 5 cases   already minimal
+      The importer reported a different latest_glucose when the entries were in a different order.
+      recordchaos replay results/cases/c-0014
+
+67 of 80 cases broke the importer.
+report    results/report.html   junit results/junit.xml   exit 1

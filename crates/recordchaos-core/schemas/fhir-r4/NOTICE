@@ -1,0 +1,16 @@
+fhir.schema.json
+
+Source: https://hl7.org/fhir/R4/fhir.schema.json.zip (HL7 FHIR R4, version 4.0.1),
+downloaded 2026-11-14. The zip's entry is dated 2019-11-01.
+SHA-256 of fhir.schema.json:
+2230406893b4cf002a4ee1e5e2bbeca22ac5d2d4931b3e9ef7b9594bbc376a01
+
+Licence: the FHIR specification is licensed CC0 ("You can redistribute FHIR",
+https://hl7.org/fhir/R4/license.html).
+
+This file is kept exactly as published. HL7 forbids publishing an altered
+version as FHIR, so it is never edited. Any local fixes go in a separate
+overlay file, not here.
+
+HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health
+Level Seven International and their use does not constitute endorsement by HL7.

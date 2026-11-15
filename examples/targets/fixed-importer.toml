@@ -1,0 +1,14 @@
+# The same example importer with its four bugs fixed. Every built-in oracle
+# should pass against it.
+kind = "command"
+reset   = ["./target/debug/examples/buggy_importer", "--fixed", "--state", "target/fixed-importer-state.json", "reset"]
+ingest  = ["./target/debug/examples/buggy_importer", "--fixed", "--state", "target/fixed-importer-state.json", "ingest"]
+observe = ["./target/debug/examples/buggy_importer", "--fixed", "--state", "target/fixed-importer-state.json", "observe"]
+timeout_ms = 5000
+
+[accept]
+rejected_exit_codes = [2]
+
+[view]
+latest_glucose = "/latest/synthetic-glucose"
+patient_count  = "/patients/count"

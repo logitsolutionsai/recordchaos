@@ -1,0 +1,407 @@
+{
+  "resourceType": "Bundle",
+  "id": "patient-a",
+  "meta": {
+    "tag": [
+      {
+        "system": "https://example.org/recordchaos/codes",
+        "code": "synthetic-test-data",
+        "display": "Synthetic test data only"
+      }
+    ]
+  },
+  "type": "collection",
+  "timestamp": "2026-01-15T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://example.org/fhir/Patient/pat-a",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat-a",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Synthetic patient Ada. Test data only.</div>"
+        },
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/mrn",
+            "value": "A-0001"
+          }
+        ],
+        "active": true,
+        "name": [
+          {
+            "family": "Synthetic",
+            "given": [
+              "Ada"
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "email",
+            "value": "ada.synthetic@example.org"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1980-04-12"
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Practitioner/prac-1",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "prac-1",
+        "name": [
+          {
+            "family": "Testwell",
+            "given": [
+              "Rowan"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Encounter/enc-a1",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-a1",
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "period": {
+          "start": "2026-01-02T08:00:00Z",
+          "end": "2026-01-02T09:30:00Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Encounter/enc-a2",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-a2",
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "period": {
+          "start": "2026-01-10T08:00:00Z",
+          "end": "2026-01-10T09:30:00Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-glucose-1",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-glucose-1",
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/lab-accession",
+            "value": "ACC-1001"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-glucose",
+              "display": "Synthetic glucose"
+            }
+          ],
+          "text": "Synthetic glucose"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a1"
+        },
+        "effectiveDateTime": "2026-01-02T08:30:00Z",
+        "issued": "2026-01-02T09:12:00Z",
+        "valueQuantity": {
+          "value": 6.4,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-glucose-2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-glucose-2",
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/lab-accession",
+            "value": "ACC-1002"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-glucose",
+              "display": "Synthetic glucose"
+            }
+          ],
+          "text": "Synthetic glucose"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "effectiveDateTime": "2026-01-06T08:30:00Z",
+        "issued": "2026-01-06T09:12:00Z",
+        "valueQuantity": {
+          "value": 6.8,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-glucose-3",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-glucose-3",
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/lab-accession",
+            "value": "ACC-1003"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-glucose",
+              "display": "Synthetic glucose"
+            }
+          ],
+          "text": "Synthetic glucose"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "effectiveDateTime": "2026-01-10T08:30:00Z",
+        "issued": "2026-01-10T09:12:00Z",
+        "valueQuantity": {
+          "value": 7.2,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-weight-1",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-weight-1",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-body-weight",
+              "display": "Synthetic body weight"
+            }
+          ],
+          "text": "Synthetic body weight"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "effectiveDateTime": "2026-01-10T08:15:00Z",
+        "issued": "2026-01-10T08:20:00Z",
+        "valueQuantity": {
+          "value": 72.5,
+          "unit": "kg",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-hba1c-1",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-hba1c-1",
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/lab-accession",
+            "value": "ACC-1004"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-hba1c",
+              "display": "Synthetic HbA1c"
+            }
+          ],
+          "text": "Synthetic HbA1c"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "effectiveDateTime": "2026-01-10T08:30:00Z",
+        "issued": "2026-01-12T10:00:00Z",
+        "valueQuantity": {
+          "value": 48,
+          "unit": "mmol/mol",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/mol"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/Observation/obs-protein-1",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-protein-1",
+        "identifier": [
+          {
+            "system": "https://example.org/recordchaos/lab-accession",
+            "value": "ACC-1005"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-serum-protein",
+              "display": "Synthetic serum protein"
+            }
+          ],
+          "text": "Synthetic serum protein"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "effectiveDateTime": "2026-01-10T08:30:00Z",
+        "issued": "2026-01-11T10:00:00Z",
+        "valueQuantity": {
+          "value": 70,
+          "unit": "g/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "g/L"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/DiagnosticReport/dr-a1",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "dr-a1",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-metabolic-panel",
+              "display": "Synthetic metabolic panel"
+            }
+          ],
+          "text": "Synthetic metabolic panel"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "effectiveDateTime": "2026-01-10T08:30:00Z",
+        "issued": "2026-01-12T11:00:00Z",
+        "result": [
+          {
+            "reference": "Observation/obs-glucose-3"
+          },
+          {
+            "reference": "Observation/obs-hba1c-1"
+          },
+          {
+            "reference": "Observation/obs-protein-1"
+          }
+        ],
+        "conclusion": "Synthetic report for software testing only."
+      }
+    },
+    {
+      "fullUrl": "https://example.org/fhir/MedicationRequest/medrq-a1",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "medrq-a1",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://example.org/recordchaos/codes",
+              "code": "synthetic-glucose-lowering-tablet",
+              "display": "Synthetic glucose-lowering tablet"
+            }
+          ],
+          "text": "Synthetic glucose-lowering tablet"
+        },
+        "subject": {
+          "reference": "Patient/pat-a"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-a2"
+        },
+        "authoredOn": "2026-01-14",
+        "requester": {
+          "reference": "Practitioner/prac-1"
+        },
+        "dosageInstruction": [
+          {
+            "text": "Synthetic dose 500 mg",
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 500,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

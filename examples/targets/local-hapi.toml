@@ -1,0 +1,18 @@
+# A local FHIR server (for example HAPI FHIR JPA in Docker on port 8080).
+# recordchaos only sends synthetic data to loopback hosts unless the host is
+# listed in allow_hosts and --allow-remote is passed.
+kind = "http"
+base_url = "http://127.0.0.1:8080/fhir"
+timeout_ms = 10000
+# Collection bundles are turned into transactions (PUT per entry) before posting.
+ingest = { method = "POST", path = "/", content_type = "application/fhir+json", as_transaction = true }
+# Optional. HAPI needs expunge enabled in its settings for this to work.
+reset  = { method = "POST", path = "/$expunge", body = "expunge-all.json" }
+
+[view.latest_glucose]
+get = "/Observation?patient=pat-a&code=https://example.org/recordchaos/codes|synthetic-glucose&_sort=-date&_count=1"
+pointer = "/entry/0/resource"
+
+[view.patient_count]
+get = "/Patient?_summary=count"
+pointer = "/total"

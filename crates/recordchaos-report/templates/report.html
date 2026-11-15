@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>recordchaos report · {{ verdict }}</title>
+<style>
+{% if fonts %}
+@font-face{font-family:"Geist";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,{{ fonts.sans400|safe }}) format("woff2")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,{{ fonts.sans500|safe }}) format("woff2")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:600;font-display:swap;src:url(data:font/woff2;base64,{{ fonts.sans600|safe }}) format("woff2")}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,{{ fonts.mono400|safe }}) format("woff2")}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,{{ fonts.mono500|safe }}) format("woff2")}
+{% endif %}
+:root{--ink:#0b1220;--muted:#4a5565;--rule:#e3e6eb;--surface:#f6f7f9;--ground:#ffffff;--blue:#0065FD;--blue-hover:#0654c8;--fail:#b42318;--fail-bg:#fdf1ef;--caution:#b54708;--caution-bg:#fdf5ec;--added:#eef4ff;--added-ink:#0654c8;--removed:#fdf1ef;--removed-ink:#b42318;--sq-pass:#c9ced6;--sq-rejected:#8b97a8;--code-bg:#0b1220;--code-ink:#e3e6eb;--code-muted:#8b97a8;--code-rule:#3a4658;color-scheme:light}
+/* Theme: the OS setting by default; data-theme="light" or "dark" on <html> forces one (for screenshots). */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e3e6eb;--muted:#a3adbb;--rule:#263044;--surface:#121a2b;--ground:#0b1220;--blue:#5b9bff;--blue-hover:#8bb8ff;--fail:#f97066;--fail-bg:#2a1414;--caution:#fdb022;--caution-bg:#2a2010;--added:#0f2147;--added-ink:#8bb8ff;--removed:#2a1414;--removed-ink:#f97066;--sq-pass:#3a4658;--sq-rejected:#6b778a;--code-bg:#050a14;--code-rule:#263044;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#e3e6eb;--muted:#a3adbb;--rule:#263044;--surface:#121a2b;--ground:#0b1220;--blue:#5b9bff;--blue-hover:#8bb8ff;--fail:#f97066;--fail-bg:#2a1414;--caution:#fdb022;--caution-bg:#2a2010;--added:#0f2147;--added-ink:#8bb8ff;--removed:#2a1414;--removed-ink:#f97066;--sq-pass:#3a4658;--sq-rejected:#6b778a;--code-bg:#050a14;--code-rule:#263044;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:Geist,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:22px;font-variant-numeric:tabular-nums}
+a{color:var(--blue)}a:hover{color:var(--blue-hover)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+code,.mono{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:32px}
+header.top{border-bottom:1px solid var(--rule)}
+header.top .wrap{padding-block:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
+.brand{display:flex;align-items:baseline;gap:10px}.brand .name{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:15px;font-weight:500}.brand .ver{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted)}
+.synthetic{font-size:13px;line-height:18px;font-weight:600}
+main.wrap{padding-block:48px 64px;display:flex;flex-direction:column;gap:56px}
+section{display:flex;flex-direction:column}
+.summary{gap:20px}
+.runline{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+h1{margin:0;font-size:34px;line-height:40px;font-weight:600;letter-spacing:-0.01em;text-wrap:pretty}
+.lede{margin:0;max-width:720px;font-size:17px;line-height:26px;color:var(--muted);text-wrap:pretty}
+.squares{display:flex;flex-wrap:wrap;gap:4px;padding-top:8px}
+.sq{display:block;width:22px;height:22px;border-radius:2px;background:var(--sq-pass)}
+.sq.rejected{background:var(--sq-rejected)}
+.sq.rule{border:3px solid var(--fail);background:var(--fail-bg)}
+.sq.crashed{background:var(--fail)}
+.sq.notchecked{background:transparent;border:1.5px solid var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;line-height:18px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend .key{width:12px;height:12px;border-radius:2px}
+.legend strong{font-weight:600;color:var(--ink)}.legend strong.bad{color:var(--fail)}
+dl.meta{margin:8px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:0 32px;border-top:1px solid var(--rule)}
+dl.meta div{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-bottom:1px solid var(--rule)}
+dl.meta dt{font-size:13px;line-height:18px;color:var(--muted)}
+dl.meta dd{margin:0;font-size:14px;line-height:20px;overflow-wrap:anywhere}
+dl.meta dd.mono{font-size:13px}
+.caution{color:var(--caution);font-weight:500}
+h2{margin:0 0 8px;font-size:18px;line-height:24px;font-weight:600}
+article.finding{display:flex;flex-direction:column;gap:16px;padding:24px 0 32px;border-top:2px solid var(--ink)}
+article.finding:last-child{border-bottom:1px solid var(--rule)}
+.fhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.fid,.foracle{font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;color:var(--muted)}
+.fcount{margin-left:auto;font-size:13px;line-height:18px;color:var(--muted)}
+.label{display:inline-flex;align-items:center;gap:8px;padding:2px 8px;border-radius:4px;font-size:13px;line-height:20px;font-weight:600}
+.label.fail{background:var(--fail-bg);color:var(--fail)}
+.label.caution{background:var(--caution-bg);color:var(--caution)}
+.label .shape{width:8px;height:8px;border-radius:1px}
+.label.crashed .shape{background:var(--fail)}
+.label.rule .shape{border:2px solid var(--fail)}
+.label.flaky .shape{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid var(--caution);border-radius:0}
+h3{margin:0;font-size:20px;line-height:28px;font-weight:600;text-wrap:pretty}
+.fbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:24px 40px;align-items:start}
+.fleft{display:flex;flex-direction:column;gap:16px;min-width:0}
+.facts{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px 16px;font-size:14px;line-height:20px}
+.facts .k{color:var(--muted)}.facts .v{overflow-wrap:anywhere}
+table.layers{width:100%;border-collapse:collapse;font-size:13px;line-height:18px}
+table.layers caption{text-align:left;padding-bottom:8px;font-weight:600}
+table.layers tr{border-top:1px solid var(--rule)}table.layers tr:last-child{border-bottom:1px solid var(--rule)}
+table.layers td{padding:8px 0}table.layers td.r{text-align:right}
+.why{margin:0;font-size:13px;line-height:18px;color:var(--muted)}
+.fright{display:flex;flex-direction:column;gap:12px;min-width:0}
+.diff{border:1px solid var(--rule);border-radius:4px;overflow:hidden;font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;line-height:20px}
+.diff .dhead{display:flex;justify-content:space-between;gap:16px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--rule);color:var(--muted);font-size:12px}
+.diff .dhead .dlabel{min-width:0;overflow-wrap:anywhere}.diff .dhead .dcount{flex:0 0 auto;white-space:nowrap}
+.diff .dbody{overflow-x:auto}
+.dl{display:grid;grid-template-columns:48px 20px minmax(0,1fr);min-width:420px;color:var(--muted)}
+.dl span:first-child{padding-left:12px}.dl .t{white-space:pre;color:var(--ink)}
+.dl.added{background:var(--added);color:var(--added-ink)}.dl.added .t{color:var(--added-ink)}
+.dl.removed{background:var(--removed);color:var(--removed-ink)}.dl.removed .t{color:var(--removed-ink)}
+.dl.gap .t{color:var(--muted)}
+.replay{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:10px 12px 10px 16px;border-radius:4px;background:var(--code-bg);color:var(--code-ink);font-family:"Geist Mono",ui-monospace,Consolas,monospace;font-size:13px;line-height:20px}
+/* Long commands wrap inside the box; Copy still copies the exact command. */
+.replay .cmd{min-width:0;padding-block:6px;white-space:pre-wrap;overflow-wrap:anywhere}.replay .prompt{color:var(--code-muted)}
+.replay button{flex:0 0 auto;min-height:32px;padding:0 12px;border:1px solid var(--code-rule);border-radius:4px;background:transparent;color:var(--code-ink);font:500 12px/1 Geist,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.nofail{margin:0;font-size:15px;color:var(--muted)}
+.tablehead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:16px}
+.tablehead h2{margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{min-height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:4px;background:var(--ground);color:var(--ink);font:500 13px/1 Geist,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.filters button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--ground)}
+.tablewrap{overflow-x:auto;border-top:1px solid var(--rule)}
+table.cases{width:100%;min-width:880px;border-collapse:collapse;font-size:13px;line-height:18px}
+table.cases thead tr{text-align:left;color:var(--muted);background:var(--surface)}
+table.cases th{padding:10px 12px;font-weight:500}
+table.cases td{padding:10px 12px;vertical-align:top}
+table.cases tbody tr{border-top:1px solid var(--rule)}table.cases tbody tr:last-child{border-bottom:1px solid var(--rule)}
+table.cases td.mono{font-family:"Geist Mono",ui-monospace,Consolas,monospace}
+table.cases td.id,table.cases td.nowrap{white-space:nowrap}
+td.bad{color:var(--fail);font-weight:600}td.warn{color:var(--caution)}
+.tablenote{margin-top:16px;font-size:13px;line-height:18px;color:var(--muted)}
+.notchecked{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:24px 40px;border-top:1px solid var(--rule);padding-top:16px;margin-top:8px}
+.notchecked div{display:flex;flex-direction:column;gap:6px}
+.notchecked h3{font-size:15px;line-height:22px}
+.notchecked p{margin:0;font-size:14px;line-height:20px;color:var(--muted);text-wrap:pretty}
+footer.bottom{border-top:1px solid var(--rule)}
+footer.bottom .wrap{padding-block:20px 32px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:13px;line-height:18px;color:var(--muted)}
+footer.bottom strong{font-weight:600;color:var(--ink)}
+footer.bottom .wrap>span{min-width:0;overflow-wrap:anywhere}
+@media (max-width:480px){.wrap{padding-inline:16px}h1{font-size:28px;line-height:34px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<div class="brand"><span class="name">recordchaos</span><span class="ver">{{ version }}</span></div>
+<span class="synthetic">Synthetic test data only</span>
+</div></header>
+
+<main class="wrap">
+<section class="summary" aria-labelledby="verdict">
+<div class="runline">{% if generated_at %}run {{ generated_at }} · {% endif %}{{ scenario_path }}</div>
+<h1 id="verdict">{{ verdict }}</h1>
+<p class="lede">{{ lede }}</p>
+<div class="squares" aria-label="One square per case">
+{% for s in squares %}<a class="sq {{ s.class }}" href="#{{ s.href }}" aria-label="{{ s.id }} {{ s.label }}" title="{{ s.id }} {{ s.label }}"></a>{% endfor %}
+</div>
+<div class="legend">
+<span><span class="key sq"></span><strong>{{ counts.handled }}</strong> handled correctly</span>
+<span><span class="key sq rejected"></span><strong>{{ counts.rejected }}</strong> rejected cleanly, as expected</span>
+<span><span class="key sq rule" style="border-width:2px"></span><strong class="{% if counts.rule %}bad{% endif %}">{{ counts.rule }}</strong> rule broken</span>
+<span><span class="key sq crashed"></span><strong class="{% if counts.crashed %}bad{% endif %}">{{ counts.crashed }}</strong> crashed</span>
+{% if counts.notchecked %}<span><span class="key sq notchecked"></span><strong>{{ counts.notchecked }}</strong> not checked</span>{% endif %}
+</div>
+<dl class="meta">
+{% for m in meta %}<div><dt>{{ m.label }}</dt><dd class="{% if m.mono %}mono{% endif %}">{{ m.value }}{% if m.caution %} <span class="caution">{{ m.caution }}</span>{% endif %}</dd></div>
+{% endfor %}
+</dl>
+</section>
+
+<section aria-labelledby="findings">
+<h2 id="findings">Failures, Grouped by Cause</h2>
+{% if not findings %}<p class="nofail">No case broke the importer. Every applicable check passed or the importer rejected the case cleanly.</p>{% endif %}
+{% for f in findings %}
+<article class="finding" id="{{ f.anchor }}">
+<div class="fhead">
+<span class="fid">{{ f.id }}</span>
+<span class="label {{ f.label_class }}"><span class="shape"></span>{{ f.label }}</span>
+<span class="foracle">{{ f.oracle }}</span>
+<span class="fcount">{{ f.count_line }}</span>
+</div>
+<h3>{{ f.sentence }}</h3>
+<div class="fbody">
+<div class="fleft">
+<div class="facts">
+{% for r in f.facts %}<span class="k">{{ r.label }}</span><span class="v">{% if r.mono %}<code>{{ r.value }}</code>{% else %}{{ r.value }}{% endif %}</span>
+{% endfor %}
+</div>
+<table class="layers">
+<caption>Validation of the shrunk bundle</caption>
+<tbody>
+{% for l in f.layers %}<tr><td>{{ l.name }}</td><td class="r{% if l.caution %} caution{% endif %}">{{ l.value }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% if f.note %}<p class="why">{{ f.note }}</p>{% endif %}
+</div>
+<div class="fright">
+{% if f.diff %}
+<div class="diff">
+<div class="dhead"><span class="dlabel">{{ f.diff_title }}</span><span class="dcount">{{ f.diff_side }}</span></div>
+<div class="dbody" role="group" aria-label="Diff of the shrunk bundle against the base bundle">
+{% for d in f.diff %}<div class="dl {{ d.class }}"><span>{{ d.line }}</span><span>{{ d.sign }}</span><span class="t">{{ d.text }}</span></div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+<div class="replay"><span class="cmd"><span class="prompt">$ </span><span class="c">{{ f.replay }}</span></span><button type="button" data-copy="{{ f.replay }}" hidden>Copy</button></div>
+</div>
+</div>
+</article>
+{% endfor %}
+</section>
+
+<section aria-labelledby="cases">
+<div class="tablehead">
+<h2 id="cases">All {{ total }} Cases</h2>
+<div class="filters" hidden>
+<button type="button" aria-pressed="true" data-filter="all">All</button>
+<button type="button" aria-pressed="false" data-filter="failed">Failed {{ counts.failed }}</button>
+<button type="button" aria-pressed="false" data-filter="invalid">Expected invalid {{ counts.invalid }}</button>
+</div>
+</div>
+<div class="tablewrap">
+<table class="cases">
+<thead><tr><th scope="col">Case</th><th scope="col">Mutation</th><th scope="col">Intended</th><th scope="col">Schema</th><th scope="col">References</th><th scope="col">HL7 validator</th><th scope="col">Importer</th></tr></thead>
+<tbody>
+{% for c in cases %}<tr id="{{ c.id }}" data-tags="{{ c.tags }}">
+<td class="mono id">{% if c.finding_anchor %}<a href="#{{ c.finding_anchor }}">{{ c.id }}</a>{% else %}{{ c.id }}{% endif %}</td>
+<td class="mono">{{ c.mutation }}</td>
+<td>{{ c.intended }}</td>
+<td>{{ c.schema }}</td>
+<td>{{ c.references }}</td>
+<td class="nowrap{% if c.strict_caution %} warn{% endif %}">{{ c.strict }}</td>
+<td class="nowrap{% if c.bad %} bad{% endif %}">{{ c.importer }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<div class="tablenote">Every case is in this table. The filter buttons need scripts; with scripts off, every row shows.</div>
+</section>
+
+<section aria-labelledby="notchecked">
+<h2 id="notchecked">What This Run Did Not Check</h2>
+<div class="notchecked">
+{% for n in not_checked %}<div><h3>{{ n.title }}</h3><p>{{ n.text }}</p></div>
+{% endfor %}
+</div>
+</section>
+</main>
+
+<footer class="bottom"><div class="wrap">
+<span>recordchaos {{ version }} · {{ footer_inputs }} · <strong>Synthetic test data only</strong></span>
+<span>Built by <a href="{{ guide_url|safe }}">Logit Solutions AI</a></span>
+</div></footer>
+
+<script>
+(function(){
+  var buttons=document.querySelectorAll('[data-filter]');
+  var wrap=document.querySelector('.filters');
+  if(wrap){wrap.hidden=false;}
+  Array.prototype.forEach.call(buttons,function(b){
+    b.addEventListener('click',function(){
+      var f=b.getAttribute('data-filter');
+      Array.prototype.forEach.call(buttons,function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+      Array.prototype.forEach.call(document.querySelectorAll('tr[data-tags]'),function(r){
+        var tags=' '+r.getAttribute('data-tags')+' ';
+        r.hidden=!(f==='all'||tags.indexOf(' '+f+' ')>=0);
+      });
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
+    if(!navigator.clipboard){return;}
+    b.hidden=false;
+    b.addEventListener('click',function(){
+      navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy';},1500);});
+    });
+  });
+})();
+</script>
+</body>
+</html>

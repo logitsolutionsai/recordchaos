@@ -1,0 +1,30 @@
+# Reference shapes: urn:uuid and absolute URLs (meaning kept), dangling and
+# cross-patient references (invalid), and duplicate fullUrls.
+fhir_version = "4.0.1"
+base = "../fixtures/bundles/family-c.json"
+seed = 1702
+cases = 40
+max_mutations_per_case = 2
+
+[[operator]]
+id = "reference.to_urn_uuid"
+weight = 2
+
+[[operator]]
+id = "reference.to_absolute_url"
+args = { base = "https://example.org/fhir" }
+weight = 2
+
+[[operator]]
+id = "reference.dangling_target"
+weight = 2
+
+[[operator]]
+id = "reference.cross_patient"
+weight = 2
+
+[[operator]]
+id = "bundle.duplicate_full_url"
+
+[[operator]]
+id = "bundle.reorder_entries"

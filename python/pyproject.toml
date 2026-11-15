@@ -1,0 +1,37 @@
+[build-system]
+requires = ["maturin>=1.16,<2"]
+build-backend = "maturin"
+
+[project]
+name = "recordchaos"
+description = "Breaks synthetic HL7 FHIR R4 patient record bundles on purpose to test your importer. Includes a pytest plugin."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "Logit Solutions AI" }]
+keywords = ["fhir", "testing", "fuzzing", "pytest", "healthcare"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ["pytest>=9.2"]
+
+[project.urls]
+Repository = "https://github.com/logitsolutionsai/recordchaos"
+Guide = "https://logitsolutions.ai/guides/ai-in-medical-practices/"
+
+[project.entry-points.pytest11]
+recordchaos = "recordchaos.pytest_plugin"
+
+[tool.maturin]
+python-source = "."
+module-name = "recordchaos._core"
+manifest-path = "Cargo.toml"

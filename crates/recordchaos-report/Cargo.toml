@@ -1,0 +1,25 @@
+[package]
+name = "recordchaos-report"
+description = "HTML report and JUnit XML for recordchaos runs."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+keywords.workspace = true
+categories.workspace = true
+# The embedded fonts and their licence live in this crate, so the published
+# package carries them.
+include = ["src/**", "templates/**", "assets/fonts/*.woff2", "assets/fonts/OFL.txt", "Cargo.toml"]
+
+[dependencies]
+recordchaos-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+minijinja.workspace = true
+quick-junit.workspace = true
+base64.workspace = true
+
+[lints]
+workspace = true

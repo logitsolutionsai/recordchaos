@@ -1,0 +1,24 @@
+# The walkthrough scenario from the spec: a lab correction three days later,
+# a urn:uuid patient reference, a reordered bundle and a dangling result.
+fhir_version = "4.0.1"
+base = "../fixtures/bundles/patient-a.json"
+seed = 49302
+cases = 25
+max_mutations_per_case = 3
+
+[[operator]]
+id = "observation.duplicate_with_changed_issued"
+select = { resource_type = "Observation", code = "synthetic-glucose" }
+args = { days_later = 3 }
+weight = 3
+
+[[operator]]
+id = "reference.to_urn_uuid"
+select = { resource_type = "Patient" }
+
+[[operator]]
+id = "bundle.reorder_entries"
+
+[[operator]]
+id = "reference.dangling_target"
+select = { resource_type = "DiagnosticReport", field = "result" }

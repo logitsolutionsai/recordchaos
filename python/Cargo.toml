@@ -1,0 +1,32 @@
+[package]
+name = "recordchaos-python"
+description = "Python bindings and pytest plugin for recordchaos, built with maturin."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[lib]
+# maturin's module-name is recordchaos._core, so the library is _core.
+name = "_core"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+recordchaos-core.workspace = true
+recordchaos-report.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# abi3-py310: one wheel per platform for every Python from 3.10 (pytest 9.2
+# needs 3.10 or later). The extension-module feature is deprecated in PyO3
+# 0.30; maturin 1.16 links extension modules correctly without it.
+pyo3 = { workspace = true, features = ["abi3-py310"] }
+
+[package.metadata.dist]
+dist = false
+
+[lints]
+workspace = true

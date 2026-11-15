@@ -1,0 +1,43 @@
+# The demo and integration-test scenario. Run against the buggy example
+# importer it should find all four seeded bugs; against `--fixed`, none.
+fhir_version = "4.0.1"
+base = "../fixtures/bundles/patient-a.json"
+seed = 20261114
+cases = 80
+max_mutations_per_case = 3
+
+[[operator]]
+id = "observation.duplicate_with_changed_issued"
+select = { resource_type = "Observation", code = "synthetic-glucose" }
+args = { days_later = 3 }
+weight = 3
+
+[[operator]]
+id = "observation.correction_sequence"
+select = { resource_type = "Observation", code = "synthetic-glucose" }
+
+[[operator]]
+id = "reference.to_urn_uuid"
+select = { resource_type = "Patient" }
+weight = 2
+
+[[operator]]
+id = "bundle.reorder_entries"
+weight = 3
+
+[[operator]]
+id = "reference.dangling_target"
+select = { resource_type = "DiagnosticReport", field = "result" }
+weight = 2
+
+[[operator]]
+id = "time.timezone_offset_shift"
+
+[[operator]]
+id = "quantity.equivalent_unit"
+
+[[operator]]
+id = "text.unicode_narrative"
+
+[[operator]]
+id = "observation.remove_code"

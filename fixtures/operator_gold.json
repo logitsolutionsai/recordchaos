@@ -1,0 +1,206 @@
+{
+  "format": 1,
+  "notes": "For each operator: the fixture, a fixed target, args and seed, the JSON Patch operations it must produce (op and path; * matches one path segment) and the intended result on each layer. \"any\" means the layer's answer is not part of the gold expectation. Strict expectations are checked only when Java and validator_cli.jar are present.",
+  "operators": {
+    "observation.duplicate_with_changed_issued": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-3" },
+      "args": { "days_later": 3 },
+      "seed": 1,
+      "patch": [["add", "/entry/7"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "observation.correction_sequence": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-3" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/6/resource/issued"], ["replace", "/entry/6/resource/valueQuantity/value"]],
+      "pre_step": true,
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "identifier.duplicate_business_identifier": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["*", "/entry/*/resource/identifier"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "medication.conflicting_active_requests": {
+      "fixture": "patient-a.json",
+      "target": { "key": "MedicationRequest/medrq-a1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["add", "/entry/12"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "time.backdate_effective": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": { "days": 30 },
+      "seed": 1,
+      "patch": [["replace", "/entry/4/resource/effectiveDateTime"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "time.future_effective": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/4/resource/effectiveDateTime"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "time.date_only_precision": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/4/resource/effectiveDateTime"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "time.timezone_offset_shift": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1", "path": "/issued" },
+      "args": { "offset": "+05:00" },
+      "seed": 1,
+      "patch": [["replace", "/entry/4/resource/issued"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "time.period_end_before_start": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Encounter/enc-a1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/2/resource/period/start"], ["replace", "/entry/2/resource/period/end"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "invalid" }
+    },
+    "quantity.equivalent_unit": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-protein-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/9/resource/valueQuantity/code"], ["replace", "/entry/9/resource/valueQuantity/unit"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "quantity.remove_unit_code": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["remove", "/entry/4/resource/valueQuantity/code"], ["remove", "/entry/4/resource/valueQuantity/system"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "observation.data_absent_reason": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-weight-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["remove", "/entry/7/resource/valueQuantity"], ["add", "/entry/7/resource/dataAbsentReason"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "observation.remove_code": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["remove", "/entry/4/resource/code"]],
+      "validity": { "schema": "invalid", "references": "valid", "strict": "invalid" }
+    },
+    "observation.remove_status": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Observation/obs-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["remove", "/entry/4/resource/status"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "invalid" }
+    },
+    "reference.to_urn_uuid": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Patient/pat-a" },
+      "args": {},
+      "seed": 1,
+      "patch": [
+        ["replace", "/entry/0/fullUrl"],
+        ["replace", "/entry/2/resource/subject/reference"],
+        ["replace", "/entry/3/resource/subject/reference"],
+        ["replace", "/entry/4/resource/subject/reference"],
+        ["replace", "/entry/5/resource/subject/reference"],
+        ["replace", "/entry/6/resource/subject/reference"],
+        ["replace", "/entry/7/resource/subject/reference"],
+        ["replace", "/entry/8/resource/subject/reference"],
+        ["replace", "/entry/9/resource/subject/reference"],
+        ["replace", "/entry/10/resource/subject/reference"],
+        ["replace", "/entry/11/resource/subject/reference"]
+      ],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "reference.to_absolute_url": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Patient/pat-a" },
+      "args": { "base": "https://example.org/fhir" },
+      "seed": 1,
+      "patch": [
+        ["replace", "/entry/2/resource/subject/reference"],
+        ["replace", "/entry/3/resource/subject/reference"],
+        ["replace", "/entry/4/resource/subject/reference"],
+        ["replace", "/entry/5/resource/subject/reference"],
+        ["replace", "/entry/6/resource/subject/reference"],
+        ["replace", "/entry/7/resource/subject/reference"],
+        ["replace", "/entry/8/resource/subject/reference"],
+        ["replace", "/entry/9/resource/subject/reference"],
+        ["replace", "/entry/10/resource/subject/reference"],
+        ["replace", "/entry/11/resource/subject/reference"]
+      ],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "reference.dangling_target": {
+      "fixture": "patient-a.json",
+      "target": { "key": "DiagnosticReport/dr-a1", "path": "/result/0/reference" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/10/resource/result/0/reference"]],
+      "validity": { "schema": "valid", "references": "invalid", "strict": "any" }
+    },
+    "reference.cross_patient": {
+      "fixture": "family-c.json",
+      "target": { "key": "Observation/obs-c1-glucose-1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/4/resource/subject/reference"]],
+      "validity": { "schema": "valid", "references": "invalid", "strict": "any" }
+    },
+    "bundle.reorder_entries": {
+      "fixture": "patient-a.json",
+      "target": {},
+      "args": {},
+      "seed": 1,
+      "patch_all": ["move", "/entry/*"],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "bundle.duplicate_full_url": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Encounter/enc-a1" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/*/fullUrl"]],
+      "validity": { "schema": "valid", "references": "invalid", "strict": "invalid" }
+    },
+    "resource.unexpected_type": {
+      "fixture": "patient-a.json",
+      "target": {},
+      "args": { "resource_type": "Specimen" },
+      "seed": 1,
+      "patch": [["add", "/entry/-"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    },
+    "text.unicode_narrative": {
+      "fixture": "patient-a.json",
+      "target": { "key": "Patient/pat-a" },
+      "args": {},
+      "seed": 1,
+      "patch": [["replace", "/entry/0/resource/text"]],
+      "validity": { "schema": "valid", "references": "valid", "strict": "valid" }
+    }
+  }
+}
